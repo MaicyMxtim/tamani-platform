@@ -1,0 +1,21 @@
+# Sync wave -1: namespaces, quotas and rbac reconcile before anything
+# that depends on them.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tenancy
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MaicyMxtim/tamani-platform.git
+    targetRevision: main
+    path: platform/k8s/tenancy
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

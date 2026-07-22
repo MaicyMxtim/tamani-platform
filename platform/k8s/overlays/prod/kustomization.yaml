@@ -3,13 +3,18 @@ kind: Kustomization
 namespace: tamani-prod
 resources:
   - ../../base
+# Prod pins image digests by commit sha; promotion is a PR that updates
+# these tags (Argo CD Image Updater automates dev later, per the plan).
 images:
   - name: tamani-api
-    newTag: prod
+    newName: ghcr.io/maicymxtim/tamani-api
+    newTag: main
   - name: tamani-gateway
-    newTag: prod
+    newName: ghcr.io/maicymxtim/tamani-gateway
+    newTag: main
   - name: tamani-worker
-    newTag: prod
+    newName: ghcr.io/maicymxtim/tamani-worker
+    newTag: main
 patches:
   - target:
       kind: Deployment

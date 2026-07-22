@@ -1,0 +1,20 @@
+# App-of-apps: this single Application makes Argo CD manage everything
+# under platform/argocd/apps, which in turn defines the whole platform.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MaicyMxtim/tamani-platform.git
+    targetRevision: main
+    path: platform/argocd/apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

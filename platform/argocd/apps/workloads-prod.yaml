@@ -1,0 +1,19 @@
+# Production workloads: NO automated sync. Promotion is a deliberate
+# act — a human syncs after reviewing what would change.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: workloads-prod
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MaicyMxtim/tamani-platform.git
+    targetRevision: main
+    path: platform/k8s/overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tamani-prod
+  syncPolicy:
+    syncOptions:
+      - PruneLast=true
