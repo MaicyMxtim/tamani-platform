@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.tfstate*
+.terraform/
+.DS_Store
+.pytest_cache/
+node_modules/

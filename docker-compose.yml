@@ -1,0 +1,65 @@
+services:
+  api:
+    build: apps/api
+    ports: ["8000:8000"]
+    environment:
+      STARTUP_GRACE_SECONDS: "0"
+    depends_on: [redis]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  gateway:
+    build: apps/gateway
+    ports: ["8001:8001"]
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      TENANT_KEYS: "dev:dev-local-key,mobile:mobile-local-key"
+    depends_on: [redis]
+
+  worker:
+    build: apps/worker
+    environment:
+      NATS_URL: nats://nats:4222
+      GATEWAY_URL: http://gateway:8001
+      GATEWAY_KEY: dev-local-key
+      REDIS_URL: redis://redis:6379/0
+    depends_on: [nats, gateway, redis]
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  nats:
+    image: nats:2.10-alpine
+    command: ["-js"]
+    ports: ["4222:4222", "8222:8222"]
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tamani
+      POSTGRES_PASSWORD: tamani-local
+      POSTGRES_DB: tamani
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports: ["3000:3000"]
+
+volumes:
+  pgdata:
