@@ -11,6 +11,7 @@ RUN useradd --uid 10001 --no-create-home appuser
 COPY --from=builder /install /usr/local
 WORKDIR /app
 COPY main.py .
+COPY data/ data/
 USER 10001
 EXPOSE 8000
 # Liveness probes /health/live, readiness probes /health/ready.
