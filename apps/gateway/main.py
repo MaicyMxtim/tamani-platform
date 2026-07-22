@@ -83,12 +83,12 @@ def tenant(x_api_key: str = Header(default="")) -> str:
 
 
 class ClassifyRequest(BaseModel):
-    venue_id: int
+    venue_id: str
     description: str = Field(min_length=1, max_length=4000)
 
 
 class ClassifyResponse(BaseModel):
-    venue_id: int
+    venue_id: str
     vibes: list[str]
     model: str
     prompt_version: str
@@ -123,7 +123,7 @@ def classify(req: ClassifyRequest, tenant_id: str = Depends(tenant)):
 
     if (hit := r.get(cache_key)) is not None:
         body = json.loads(hit)
-        log.info("cache hit for venue %d tenant %s", req.venue_id, tenant_id)
+        log.info("cache hit for venue %s tenant %s", req.venue_id, tenant_id)
         return ClassifyResponse(venue_id=req.venue_id, cached=True, **body)
 
     result = mock_provider(req.description)
@@ -139,7 +139,7 @@ def classify(req: ClassifyRequest, tenant_id: str = Depends(tenant)):
         "output_tokens": result["output_tokens"],
         "cost_usd": result["cost_usd"],
     })
-    log.info("classified venue %d for tenant %s", req.venue_id, tenant_id)
+    log.info("classified venue %s for tenant %s", req.venue_id, tenant_id)
     return ClassifyResponse(venue_id=req.venue_id, cached=False, **body)
 
 

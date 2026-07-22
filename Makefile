@@ -24,7 +24,7 @@ smoke:         ## hit the health endpoints of a running stack
 	curl -fsS http://localhost:8001/health/live
 	curl -fsS -X POST http://localhost:8001/v1/classify \
 		-H 'x-api-key: dev-local-key' -H 'content-type: application/json' \
-		-d '{"venue_id": 1, "description": "late night drinks with groups"}'
+		-d '{"venue_id": "smoke-test", "description": "late night drinks with groups"}'
 
 logs:          ## tail all service logs
 	docker compose logs -f

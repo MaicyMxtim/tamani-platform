@@ -47,17 +47,28 @@ app = FastAPI(
 )
 
 SAMPLE_VENUES = [
-    {"id": 1, "name": "The Salt Room", "area": "Brighton Seafront",
-     "cuisine": "Seafood", "vibes": ["special-occasion", "sit-down", "drinks"]},
-    {"id": 2, "name": "Bincho Yakitori", "area": "Preston Street",
-     "cuisine": "Japanese", "vibes": ["groups", "late-night", "drinks"]},
-    {"id": 3, "name": "Flour Pot Bakery", "area": "Sydney Street",
-     "cuisine": "Cafe", "vibes": ["coffee", "quick", "work-friendly", "brunch"]},
-    {"id": 4, "name": "Cin Cin", "area": "Vine Street",
-     "cuisine": "Italian", "vibes": ["sit-down", "special-occasion", "solo-friendly"]},
-    {"id": 5, "name": "Plateau", "area": "Bartholomews",
-     "cuisine": "French / Natural Wine", "vibes": ["drinks", "late-night", "groups"]},
+    {"id": "sample-1", "name": "The Salt Room", "area": "Brighton Seafront",
+     "type_label": "Seafood", "tags": ["special-occasion", "sit-down", "drinks"]},
+    {"id": "sample-2", "name": "Flour Pot Bakery", "area": "Sydney Street",
+     "type_label": "Cafe", "tags": ["coffee", "quick", "work-friendly", "brunch"]},
 ]
+
+_VENUES_CACHE: list[dict] | None = None
+
+
+def _static_venues() -> list[dict]:
+    """Load the bundled snapshot once. Falls back to the inline sample."""
+    global _VENUES_CACHE
+    if _VENUES_CACHE is None:
+        path = os.getenv("VENUES_FILE", "/app/data/venues.static.json")
+        try:
+            with open(path) as f:
+                _VENUES_CACHE = json.load(f)
+            log.info("loaded %d venues from %s", len(_VENUES_CACHE), path)
+        except OSError:
+            log.warning("no static venue file at %s, using inline sample", path)
+            _VENUES_CACHE = SAMPLE_VENUES
+    return _VENUES_CACHE
 
 _started_at = time.monotonic()
 STARTUP_GRACE_SECONDS = float(os.getenv("STARTUP_GRACE_SECONDS", "0"))
@@ -105,36 +116,40 @@ def startup():
 def _load_venues() -> list[dict]:
     dsn = os.getenv("DATABASE_URL")
     if not dsn:
-        return SAMPLE_VENUES
+        return _static_venues()
     import psycopg
     from psycopg.rows import dict_row
     with psycopg.connect(dsn, row_factory=dict_row) as conn:
         return conn.execute(
-            "SELECT id, name, area, cuisine, vibes FROM venues"
+            "SELECT id, name, area, type_label, tags, band, rating FROM venues"
         ).fetchall()
 
 
 @app.get("/venues")
 def venues(
-    vibe: str | None = Query(default=None),
-    cuisine: str | None = Query(default=None),
+    vibe: str | None = Query(default=None, description="tag filter, e.g. late-night"),
+    area: str | None = Query(default=None),
+    band: str | None = Query(default=None, description="price band, e.g. under_5"),
     q: str | None = Query(default=None, description="free-text name search"),
+    limit: int = Query(default=50, le=500),
 ):
     result = _load_venues()
     if vibe:
-        result = [v for v in result if vibe in v["vibes"]]
-    if cuisine:
-        result = [v for v in result if cuisine.lower() in v["cuisine"].lower()]
+        result = [v for v in result if vibe in (v.get("tags") or [])]
+    if area:
+        result = [v for v in result if area.lower() in (v.get("area") or "").lower()]
+    if band:
+        result = [v for v in result if v.get("band") == band]
     if q:
         result = [v for v in result if q.lower() in v["name"].lower()]
     log.info("venue search returned %d results", len(result))
-    return {"count": len(result), "venues": result}
+    return {"count": len(result), "venues": result[:limit]}
 
 
 @app.get("/venues/{venue_id}")
-def venue(venue_id: int):
+def venue(venue_id: str):
     for v in _load_venues():
-        if v["id"] == venue_id:
+        if str(v["id"]) == venue_id:
             return v
     raise HTTPException(status_code=404, detail="venue not found")
 
@@ -142,7 +157,12 @@ def venue(venue_id: int):
 @app.get("/feed")
 def feed(limit: int = Query(default=20, le=100)):
     """Public feed consumed by the mobile client and the web MVP."""
-    return {"venues": _load_venues()[:limit]}
+    ranked = sorted(
+        _load_venues(),
+        key=lambda v: (v.get("rating") or 0) * (v.get("rating_count") or 0),
+        reverse=True,
+    )
+    return {"venues": ranked[:limit]}
 
 
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
