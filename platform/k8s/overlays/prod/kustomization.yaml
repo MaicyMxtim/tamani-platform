@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: tamani-prod
+resources:
+  - ../../base
+images:
+  - name: tamani-api
+    newTag: prod
+  - name: tamani-gateway
+    newTag: prod
+  - name: tamani-worker
+    newTag: prod
+patches:
+  - target:
+      kind: Deployment
+      name: tamani-api
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: tamani-gateway
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 2

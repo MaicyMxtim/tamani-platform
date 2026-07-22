@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tamani-gateway
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tamani-gateway
+  labels: { app: tamani-gateway }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: tamani-gateway }
+  template:
+    metadata:
+      labels: { app: tamani-gateway }
+    spec:
+      serviceAccountName: tamani-gateway
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: gateway
+          image: tamani-gateway
+          ports: [{ containerPort: 8001 }]
+          env:
+            - name: REDIS_URL
+              value: redis://redis:6379/0
+            - name: TENANT_KEYS
+              value: "dev:dev-local-key" # ESO-provided secret from Phase 8
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 256Mi }
+          readinessProbe:
+            httpGet: { path: /health/ready, port: 8001 }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /health/live, port: 8001 }
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tamani-gateway
+spec:
+  selector: { app: tamani-gateway }
+  ports: [{ port: 80, targetPort: 8001 }]
+---
+# Only the worker may call the gateway. Egress: redis now; the LLM
+# provider endpoint is added when real providers land in Phase 5.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tamani-gateway
+spec:
+  podSelector:
+    matchLabels: { app: tamani-gateway }
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: tamani-worker }
+      ports:
+        - port: 8001
+  egress:
+    - to:
+        - podSelector:
+            matchLabels: { app: redis }
+      ports:
+        - port: 6379

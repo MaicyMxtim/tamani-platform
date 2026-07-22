@@ -8,9 +8,24 @@ The full plan lives in `docs/`. Build status by phase:
 
 | Phase | Status |
 |---|---|
-| 0. Foundation and repository structure | in progress |
-| 1. Containerisation and the workload | in progress |
-| 2–11 | not started |
+| 0. Foundation and repository structure | done except remote state (awaits AWS) |
+| 1. Containerisation and the workload | done |
+| 2. The Kubernetes platform | done on minikube; cloud env awaits AWS |
+| 3–11 | not started |
+
+Phase 2 verified on minikube (Calico CNI): restricted Pod Security on all
+namespaces, default-deny NetworkPolicy with explicit paths, developer and
+deployer RBAC personas, ResourceQuota + LimitRange per environment, and
+Kyverno rejecting latest tags, missing limits and missing app labels at
+admission. Deploy locally with:
+
+```
+minikube start --cni=calico --memory=6g --cpus=4
+kubectl apply -f platform/k8s/tenancy/
+kubectl apply -k platform/k8s/overlays/dev
+helm install kyverno kyverno/kyverno -n kyverno --create-namespace
+kubectl apply -f platform/policies/baseline.yaml
+```
 
 ## Repository layout
 
