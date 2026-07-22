@@ -1,0 +1,74 @@
+# Admission policy: what the cluster refuses regardless of who asks.
+# Enforce mode in the tamani namespaces; image signature verification
+# joins these in Phase 8.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-pinned-tag
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchExpressions:
+                  - { key: env, operator: In, values: [dev, staging, prod] }
+      validate:
+        message: "Images must use a pinned tag, not latest or none."
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest & *:*"
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-limits
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchExpressions:
+                  - { key: env, operator: In, values: [dev, staging, prod] }
+      validate:
+        message: "Every container needs cpu and memory limits."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-app-label
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: require-app-label
+      match:
+        any:
+          - resources:
+              kinds: [Deployment]
+              namespaceSelector:
+                matchExpressions:
+                  - { key: env, operator: In, values: [dev, staging, prod] }
+      validate:
+        message: "Deployments need an app label for policy and cost attribution."
+        pattern:
+          metadata:
+            labels:
+              app: "?*"

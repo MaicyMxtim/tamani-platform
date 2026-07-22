@@ -1,0 +1,28 @@
+# One namespace per environment. Pod Security admission at restricted:
+# no privileged containers, no host namespaces, non-root enforced.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tamani-dev
+  labels:
+    env: dev
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tamani-staging
+  labels:
+    env: staging
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tamani-prod
+  labels:
+    env: prod
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/warn: restricted
