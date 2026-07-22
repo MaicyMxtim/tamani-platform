@@ -15,6 +15,8 @@ images:
   - name: tamani-worker
     newName: ghcr.io/maicymxtim/tamani-worker
     newTag: main
+# Single replicas while the node is a 2 GB t3.small; returns to 2 with
+# the t3.medium upgrade when the observability stack lands (Phase 7).
 patches:
   - target:
       kind: Deployment
@@ -22,11 +24,11 @@ patches:
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 2
+        value: 1
   - target:
       kind: Deployment
       name: tamani-gateway
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 2
+        value: 1

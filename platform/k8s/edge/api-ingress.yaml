@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tamani-api
+  namespace: tamani-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/limit-rps: "20"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [platform.waypear.com]
+      secretName: platform-waypear-tls
+  rules:
+    - host: platform.waypear.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tamani-api
+                port:
+                  number: 80
