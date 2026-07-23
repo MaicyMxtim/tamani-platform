@@ -44,6 +44,12 @@ spec:
           livenessProbe:
             httpGet: { path: /health/live, port: 8001 }
             periodSeconds: 10
+          # Root stays read-only; the embedding runtime needs one scratch dir.
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -53,8 +59,9 @@ spec:
   selector: { app: tamani-gateway }
   ports: [{ port: 80, targetPort: 8001 }]
 ---
-# Only the worker may call the gateway. Egress: redis now; the LLM
-# provider endpoint is added when real providers land in Phase 5.
+# Only the worker may call the gateway. Egress: redis, plus HTTPS out to
+# the LLM provider — the single external call path the platform allows,
+# and only from this one workload.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -75,3 +82,9 @@ spec:
             matchLabels: { app: redis }
       ports:
         - port: 6379
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16]
+      ports:
+        - port: 443
