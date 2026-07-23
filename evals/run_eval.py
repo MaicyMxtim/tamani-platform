@@ -14,7 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 
 GATEWAY = (sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8001") + "/v1/classify"
-KEY = "dev-local-key"
+KEY = __import__("os").getenv("EVAL_KEY", "dev-local-key")
 ROOT = Path(__file__).resolve().parent
 
 golden = [json.loads(l) for l in open(ROOT / "golden_set.jsonl") if l.strip()]
@@ -29,11 +29,20 @@ predictions = []
 for i, row in enumerate(golden):
     req = urllib.request.Request(
         GATEWAY,
-        data=json.dumps({"venue_id": f"eval-{row['venue_id']}",
+        data=json.dumps({"venue_id": f"eval-{row['venue_id']}", "bypass_cache": True,
                          "description": row["description"]}).encode(),
         headers={"x-api-key": KEY, "content-type": "application/json"},
     )
-    body = json.load(urllib.request.urlopen(req, timeout=120))
+    while True:
+        try:
+            body = json.load(urllib.request.urlopen(req, timeout=120))
+            break
+        except urllib.error.HTTPError as e:
+            if e.code != 429:
+                raise
+            wait = int(e.headers.get("retry-after", "30"))
+            print(f"  budget throttled, waiting {wait}s")
+            time.sleep(wait)
     pred, truth = set(body["vibes"]), set(row["tags"])
     spend += body["cost_usd"]
     predictions.append({"venue_id": row["venue_id"], "pred": sorted(pred),

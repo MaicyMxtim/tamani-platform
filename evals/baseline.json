@@ -1,0 +1,6 @@
+{
+ "micro_precision": 0.8027,
+ "micro_recall": 0.6799,
+ "prompt_version": "v1",
+ "n": 144
+}

@@ -1,0 +1,1960 @@
+{
+ "timestamp": "20260723-150137",
+ "micro_precision": 0.6709,
+ "micro_recall": 0.7564,
+ "spend_usd": 0.1757,
+ "n": 144,
+ "per_tag": {
+  "brunch": {
+   "tp": 15,
+   "fp": 5,
+   "fn": 8
+  },
+  "coffee": {
+   "tp": 27,
+   "fp": 7,
+   "fn": 2
+  },
+  "drinks": {
+   "tp": 28,
+   "fp": 5,
+   "fn": 5
+  },
+  "groups": {
+   "tp": 35,
+   "fp": 17,
+   "fn": 13
+  },
+  "late-night": {
+   "tp": 5,
+   "fp": 28,
+   "fn": 2
+  },
+  "quick": {
+   "tp": 60,
+   "fp": 13,
+   "fn": 8
+  },
+  "sit-down": {
+   "tp": 52,
+   "fp": 17,
+   "fn": 11
+  },
+  "solo-friendly": {
+   "tp": 42,
+   "fp": 38,
+   "fn": 16
+  },
+  "special-occasion": {
+   "tp": 1,
+   "fp": 1,
+   "fn": 16
+  },
+  "work-friendly": {
+   "tp": 2,
+   "fp": 0,
+   "fn": 5
+  }
+ },
+ "predictions": [
+  {
+   "venue_id": "ChIJyxYBFrKadUgRiHeRNi-UOE4",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "quick",
+    "sit-down"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJY74vQeeFdUgRoGNiI_-6EWQ",
+   "pred": [],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJu-1FS6GFdUgRkmPdSaHqWJw",
+   "pred": [
+    "drinks",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJeYJwkJiFdUgRal8d31lZFjM",
+   "pred": [],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJG_7ZvpqFdUgRu_jOQP1vwkA",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.15
+  },
+  {
+   "venue_id": "ChIJhetERjmFdUgRdVNF7S0xwsQ",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJHVqr-OCPdUgRMjNGHrF5Fqw",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJX43LP3SFdUgRztKAlNkb5fg",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJp42BtlqFdUgRfZIsdaadCp8",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJSYtuyEiFdUgR9Z0cbYxwufM",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJmW4BwKCFdUgRrsvhwtMVz38",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJt0_UM3WFdUgR0LQom8NkBm0",
+   "pred": [
+    "brunch",
+    "coffee",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "brunch",
+    "drinks",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJET-kUwCFdUgReBg6QqrFSko",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJC1UMPnSFdUgRJe-0ZsDowSY",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJhfluefCFdUgRc5qcp_wjPFE",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJZWqdd0CFdUgRUo2yAkh1ySc",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJdyo87EiFdUgRy_Fe3c2noKk",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJD4UoxhKFdUgRF5zf4J6DEGE",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJ88wKr6WFdUgRiwfLI8cQfb0",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "groups",
+    "sit-down",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJQ5KZNoWFdUgR-lE5zotrhVg",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJFR8EQ3qYdUgRbgeXF_vhnFM",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "sit-down"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJ858EB2qFdUgRtVBV8lP05Wo",
+   "pred": [
+    "brunch",
+    "coffee",
+    "sit-down"
+   ],
+   "truth": [
+    "brunch",
+    "sit-down"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJVfJWsJ2FdUgRtLIDZKVVIzk",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJBShuXXSFdUgRY2Zs6XRCiqI",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJJYMgaz2FdUgRMT7w5bWFMeA",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "groups",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJLXNIUEqFdUgR527qnsEQbKY",
+   "pred": [
+    "coffee",
+    "solo-friendly",
+    "work-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "groups",
+    "sit-down",
+    "solo-friendly",
+    "work-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJMYr4HQqFdUgRs7f_YrEcav4",
+   "pred": [
+    "drinks",
+    "late-night"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJSQuDxw2FdUgRsgRi8okQuUc",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJ25-OjnSFdUgRRB2WS11XhlU",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.72
+  },
+  {
+   "venue_id": "ChIJwek1JZaFdUgReVnVQ7_t1FE",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "late-night",
+    "quick",
+    "sit-down"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJp-s8eziFdUgRT_NwU6VSVPQ",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.85
+  },
+  {
+   "venue_id": "ChIJlSb-RnWFdUgRECuriCZomnc",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJh4j-XFCFdUgR4sYV5dVJXNg",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJ3zZpm7aFdUgR9ZBr01ibmAE",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "truth": [
+    "brunch",
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJRbDSl6SFdUgRjWxB3PevIs4",
+   "pred": [
+    "drinks",
+    "sit-down"
+   ],
+   "truth": [
+    "brunch",
+    "drinks"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJYa8XwDWFdUgRYBwC9ASXBe0",
+   "pred": [
+    "quick"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJkxoxgNuFdUgRL79aQFVH8Bc",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJJ34hsp2FdUgR_0Y7RT1SAiE",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJ67D8_RCFdUgROvKmGPbyhXc",
+   "pred": [
+    "groups",
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "quick"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJz7O-8M4wKmQRc8GAVo8YWcA",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "special-occasion"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJb4Wt2iWPdUgR30bdx6UUXDs",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJsZKNWBOFdUgR7g0NpLoz7-Y",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJ26guX4WFdUgReGGMpzXdbm0",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJbQu821mbdUgRyru2RT9OHW8",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJlzYs05qFdUgRcj8rrr-8dpk",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJH6_JAqyFdUgRSWOD8--X38k",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJFxL2J3KFdUgRtfV8zPk3Dqg",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "sit-down"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJM6h_67yFdUgRkRDLZ_b8apE",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "solo-friendly",
+    "special-occasion",
+    "work-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJdcjV86OFdUgRyHdnIv0t7JY",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJw_qFFwuFdUgRQFRdRYIk4RI",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJLaleJwCFdUgRPVkNfkvOZrM",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJsaAADwCFdUgReKUWm__NHJI",
+   "pred": [
+    "groups",
+    "quick",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJR_Vm4pmFdUgROJZD8vVa_j8",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJAQB8NoWFdUgRuhHNueKutCI",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJOTe6UACFdUgRc_s0VKyTNJg",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJ9d5gEbmFdUgRN3ejfbhxL4o",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJBauOQQ2FdUgREK45qLiUsrc",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "quick"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJDTly3QuFdUgRhgaZQjK0xkI",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJ7_f5ZneFdUgR-3WD_h0ubwI",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJv23VdwyFdUgRyfxQksJkHyQ",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJ60S8owyFdUgRZZbe0_Rx4x0",
+   "pred": [
+    "quick"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJ01J0j6OFdUgRlfZhjnpey1w",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJ4cEY106FdUgRnid-HKEIpmI",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJ_0JZ_xKFdUgRCn_P_XtCjyA",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJOWceUpaFdUgRJcejJDp9K0Q",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJwZcw7YWidUgRlME2WDloPZ8",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJN0k0rZ-FdUgR6oAZdweyxHc",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJvQzuxxKFdUgR4kPckhKcFc4",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJzfPL7tGbdUgRQEUo6nnfx9w",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "sit-down"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJIbfyMmmFdUgRQu_5MUuF1Oo",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJDz9_JrOFdUgRr1FQnjkXwE0",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJnUlkbwqFdUgR2Zje-x7Q9Ls",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJbyBcHLuFdUgRg5hzD3g__QE",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJt4FzKvqFdUgRZhZHB5STjVo",
+   "pred": [
+    "coffee",
+    "solo-friendly",
+    "work-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "work-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJOXcrfhSFdUgRPzbOwy3uvw4",
+   "pred": [
+    "brunch",
+    "coffee",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJJX7eIgqFdUgRVWKs67dLaLg",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJxxd1iQyFdUgR6inY6IBCeZk",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "work-friendly"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJq6rJxxKFdUgRBIH--pTN77g",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJIVRiUnyFdUgRzZYPEMja8-A",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJqwoOOp6FdUgRd5hW5povsXk",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "solo-friendly",
+    "work-friendly"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJF-z7c8-FdUgRGrMg77tI6S8",
+   "pred": [
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJK2RGkruFdUgRA-YTWD9U9cQ",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "groups",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJD63bv3SFdUgRyGWZDgXPGfc",
+   "pred": [],
+   "truth": [
+    "work-friendly"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJfSGjQ56FdUgRg4nsUgXdpuc",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJAbLuEwCFdUgRgl85fsiXIIo",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJa365BgCFdUgRwlIagqskJR4",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJlyHykKuFdUgRL7NbRz7wLDw",
+   "pred": [
+    "groups",
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJBQjWqxqPdUgRq4Me9aW-nRQ",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.85
+  },
+  {
+   "venue_id": "ChIJ7X1o_GKFdUgR4c0RKhrRcxQ",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.25
+  },
+  {
+   "venue_id": "ChIJm-_hb-yFdUgRS3QESZj_1AY",
+   "pred": [
+    "drinks",
+    "late-night",
+    "solo-friendly"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJlxLomayFdUgRE1HaRYf_-OU",
+   "pred": [
+    "groups",
+    "quick",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJxbiAPNCFdUgRiJl1sE2DXLU",
+   "pred": [
+    "brunch",
+    "coffee",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJzzi8jnWFdUgRa21QwLVPHeg",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJl_pFLoWbdUgRgEhZBieurik",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "brunch",
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJV3_kXEWFdUgRj54qMrtPoRE",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJt7XoRAqFdUgRLN-qk4Fwrkc",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "truth": [
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJq6pmdnOFdUgRYiKeRKbpXBc",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJWUALr2mFdUgRHmYPfQFV4nw",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJ7-jm_U-FdUgRiimYF4V8QQE",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.85
+  },
+  {
+   "venue_id": "ChIJ3-5CewuFdUgRpk2N0PtiTCQ",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJr7a4xkiFdUgRXOb_fjgWUkM",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.85
+  },
+  {
+   "venue_id": "ChIJ_bL-lWWFdUgR6kCLWkn_Y7A",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJ77pIlgyFdUgRmUGRx0fDttc",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJPzQU9QWFdUgR5_h49Dxj8dE",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJt0uk0wqFdUgRc7-HoPNUSvo",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJWZARmHyFdUgR-DOM7dhw6n0",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJw-BXT6S6RmgR-_u63mJJMA8",
+   "pred": [
+    "quick"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJi3nIKP6FdUgRIoIPJSzFfFQ",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJL_DZVBWFdUgRx6ge7PlTzfE",
+   "pred": [
+    "groups",
+    "quick",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "quick"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJ_____3SFdUgRCenk19Tce64",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJt5_Rh-iFdUgRxxoq0ukNrmo",
+   "pred": [
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJbUHipnKFdUgR88OP0QF3TCU",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJmeqkNwCFdUgR5GjB8MWlMsE",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJ_7LMfLuFdUgRBwNWhD2PWAk",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJjwtxev-FdUgRwdWUS50cA8A",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJaaHRD-2FdUgRppVPhVl1N6Y",
+   "pred": [
+    "brunch",
+    "coffee",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJVS9PW3SFdUgRTq4esn5-FR4",
+   "pred": [
+    "drinks",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJx7hU7KOFdUgRwE2Spg8qix4",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJj_KsuZCFdUgRqy7gh4u5khQ",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJzXODAwCFdUgR02NcvaOZNWg",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJYeK1yRKFdUgR1GAtbJ5mL5U",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJ5Rbdu2SadUgR3RuLx1Bk4GY",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.85
+  },
+  {
+   "venue_id": "ChIJJQHjiCGFdUgRAJHprSZzqHw",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "late-night",
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJRTF6XECFdUgRad68FC7KFx8",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "drinks",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJAQDM76OFdUgRiXZyIOEwRMk",
+   "pred": [
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJsUBOLAqFdUgRK9BHTYiT41w",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJoYx9kneFdUgR8GziMP9VWO0",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJyzltJtCFdUgR1Rvvkk6HYyQ",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick",
+    "solo-friendly"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJj-R0iXWFdUgRe1Ub5lDgPnM",
+   "pred": [
+    "groups",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "truth": [
+    "groups",
+    "sit-down"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJF-sVIACFdUgRHozKmevMoHg",
+   "pred": [
+    "groups",
+    "quick",
+    "sit-down"
+   ],
+   "truth": [
+    "quick",
+    "sit-down"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJc19jQ0WFdUgRrDMWvhoJ8cQ",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "solo-friendly"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJzc7BU3iFdUgRhSueZdzpjjo",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJYTv9qZuFdUgR2iwSVFJLDKk",
+   "pred": [
+    "quick"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.3
+  },
+  {
+   "venue_id": "ChIJdzKla8KFdUgRjHbNjXEDCUM",
+   "pred": [
+    "coffee",
+    "solo-friendly"
+   ],
+   "truth": [
+    "coffee",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJldQfOACFdUgRHr2KTcggkFA",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "sit-down"
+   ],
+   "confidence": 0.55
+  },
+  {
+   "venue_id": "ChIJy3FVEzWFdUgRtIM_bmxwOL4",
+   "pred": [
+    "brunch",
+    "drinks",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "solo-friendly",
+    "work-friendly"
+   ],
+   "confidence": 0.5
+  },
+  {
+   "venue_id": "ChIJ4dgmzEmFdUgRjj0qYouBbIA",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night",
+    "sit-down"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "sit-down",
+    "special-occasion"
+   ],
+   "confidence": 0.75
+  },
+  {
+   "venue_id": "ChIJY18CuHGFdUgRbGbLjcTlao0",
+   "pred": [
+    "brunch",
+    "coffee",
+    "solo-friendly"
+   ],
+   "truth": [
+    "brunch",
+    "coffee",
+    "sit-down",
+    "solo-friendly"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJd_iaSnWFdUgRZ35Y9omd0lc",
+   "pred": [
+    "drinks",
+    "groups",
+    "sit-down"
+   ],
+   "truth": [
+    "brunch",
+    "drinks",
+    "groups",
+    "sit-down",
+    "solo-friendly",
+    "special-occasion"
+   ],
+   "confidence": 0.8
+  },
+  {
+   "venue_id": "ChIJUy8PgDCFdUgRLPoMGP7QtM4",
+   "pred": [
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.4
+  },
+  {
+   "venue_id": "ChIJaRuUAZqFdUgRNOC6vahz9oI",
+   "pred": [
+    "late-night",
+    "quick",
+    "solo-friendly"
+   ],
+   "truth": [
+    "quick"
+   ],
+   "confidence": 0.7
+  },
+  {
+   "venue_id": "ChIJeUzG-hKFdUgRikMJXBZXOSY",
+   "pred": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "truth": [
+    "drinks",
+    "groups",
+    "late-night"
+   ],
+   "confidence": 0.6
+  },
+  {
+   "venue_id": "ChIJG5tMfaOFdUgRuXZkU_C77v8",
+   "pred": [
+    "sit-down"
+   ],
+   "truth": [
+    "sit-down"
+   ],
+   "confidence": 0.2
+  },
+  {
+   "venue_id": "ChIJWarILqeFdUgRQb16DrJCVxA",
+   "pred": [],
+   "truth": [
+    "drinks",
+    "solo-friendly"
+   ],
+   "confidence": 0.2
+  }
+ ]
+}
