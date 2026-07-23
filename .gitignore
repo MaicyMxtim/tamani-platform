@@ -8,5 +8,4 @@ __pycache__/
 .pytest_cache/
 node_modules/
 terraform.tfvars
-docs/the-story-so-far.md
 results/latest.json
