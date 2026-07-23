@@ -17,6 +17,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379/0
       TENANT_KEYS: "dev:dev-local-key,mobile:mobile-local-key"
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     depends_on: [redis]
 
   worker:

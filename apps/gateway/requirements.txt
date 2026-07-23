@@ -3,3 +3,5 @@ uvicorn[standard]==0.34.0
 prometheus-fastapi-instrumentator==7.0.2
 redis==5.2.1
 pydantic==2.10.6
+anthropic==0.116.0
+fastembed==0.4.2

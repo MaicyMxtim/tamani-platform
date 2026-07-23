@@ -1,0 +1,628 @@
+[
+ {
+  "venue_id": "ChIJ26guX4WFdUgReGGMpzXdbm0",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.6,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.6354267597198486,
+  "input_tokens": 700,
+  "output_tokens": 21,
+  "cost_usd": 0.004025
+ },
+ {
+  "venue_id": "ChIJldQfOACFdUgRHr2KTcggkFA",
+  "vibes": [
+   "sit-down",
+   "drinks"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7464912533760071,
+  "input_tokens": 696,
+  "output_tokens": 27,
+  "cost_usd": 0.004155
+ },
+ {
+  "venue_id": "ChIJmeqkNwCFdUgR5GjB8MWlMsE",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.6917038559913635,
+  "input_tokens": 697,
+  "output_tokens": 23,
+  "cost_usd": 0.00406
+ },
+ {
+  "venue_id": "ChIJPzQU9QWFdUgR5_h49Dxj8dE",
+  "vibes": [
+   "sit-down",
+   "solo-friendly"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.70949387550354,
+  "input_tokens": 706,
+  "output_tokens": 30,
+  "cost_usd": 0.00428
+ },
+ {
+  "venue_id": "ChIJhfluefCFdUgRc5qcp_wjPFE",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.654804527759552,
+  "input_tokens": 690,
+  "output_tokens": 23,
+  "cost_usd": 0.004025
+ },
+ {
+  "venue_id": "ChIJhetERjmFdUgRdVNF7S0xwsQ",
+  "vibes": [
+   "sit-down",
+   "quick",
+   "solo-friendly"
+  ],
+  "confidence": 0.5,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7487666606903076,
+  "input_tokens": 705,
+  "output_tokens": 33,
+  "cost_usd": 0.00435
+ },
+ {
+  "venue_id": "ChIJYTv9qZuFdUgR2iwSVFJLDKk",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7170953750610352,
+  "input_tokens": 706,
+  "output_tokens": 21,
+  "cost_usd": 0.004055
+ },
+ {
+  "venue_id": "ChIJwZcw7YWidUgRlME2WDloPZ8",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.6979820728302002,
+  "input_tokens": 701,
+  "output_tokens": 23,
+  "cost_usd": 0.00408
+ },
+ {
+  "venue_id": "ChIJjwtxev-FdUgRwdWUS50cA8A",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7854135036468506,
+  "input_tokens": 695,
+  "output_tokens": 21,
+  "cost_usd": 0.004
+ },
+ {
+  "venue_id": "ChIJD63bv3SFdUgRyGWZDgXPGfc",
+  "vibes": [
+   "work-friendly"
+  ],
+  "confidence": 0.15,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7787331342697144,
+  "input_tokens": 711,
+  "output_tokens": 24,
+  "cost_usd": 0.004155
+ },
+ {
+  "venue_id": "ChIJeYJwkJiFdUgRal8d31lZFjM",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.15,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8088527321815491,
+  "input_tokens": 712,
+  "output_tokens": 21,
+  "cost_usd": 0.004085
+ },
+ {
+  "venue_id": "ChIJOTe6UACFdUgRc_s0VKyTNJg",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.5,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8266279697418213,
+  "input_tokens": 703,
+  "output_tokens": 21,
+  "cost_usd": 0.00404
+ },
+ {
+  "venue_id": "ChIJw-BXT6S6RmgR-_u63mJJMA8",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8491307497024536,
+  "input_tokens": 698,
+  "output_tokens": 21,
+  "cost_usd": 0.004015
+ },
+ {
+  "venue_id": "ChIJAQB8NoWFdUgRuhHNueKutCI",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7326685190200806,
+  "input_tokens": 692,
+  "output_tokens": 21,
+  "cost_usd": 0.003985
+ },
+ {
+  "venue_id": "ChIJi3nIKP6FdUgRIoIPJSzFfFQ",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7477718591690063,
+  "input_tokens": 702,
+  "output_tokens": 23,
+  "cost_usd": 0.004085
+ },
+ {
+  "venue_id": "ChIJx7hU7KOFdUgRwE2Spg8qix4",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7308939695358276,
+  "input_tokens": 699,
+  "output_tokens": 23,
+  "cost_usd": 0.00407
+ },
+ {
+  "venue_id": "ChIJIS9ql_-FdUgRg3q68dWgL10",
+  "vibes": [],
+  "confidence": 0.1,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.689033031463623,
+  "input_tokens": 704,
+  "output_tokens": 18,
+  "cost_usd": 0.00397
+ },
+ {
+  "venue_id": "ChIJMYr4HQqFdUgRs7f_YrEcav4",
+  "vibes": [
+   "drinks",
+   "late-night",
+   "groups"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7370679378509521,
+  "input_tokens": 707,
+  "output_tokens": 29,
+  "cost_usd": 0.00426
+ },
+ {
+  "venue_id": "ChIJF-sVIACFdUgRHozKmevMoHg",
+  "vibes": [
+   "sit-down",
+   "quick"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7716739177703857,
+  "input_tokens": 700,
+  "output_tokens": 26,
+  "cost_usd": 0.00415
+ },
+ {
+  "venue_id": "ChIJyzltJtCFdUgR1Rvvkk6HYyQ",
+  "vibes": [
+   "quick",
+   "solo-friendly"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.789739727973938,
+  "input_tokens": 699,
+  "output_tokens": 28,
+  "cost_usd": 0.004195
+ },
+ {
+  "venue_id": "ChIJY74vQeeFdUgRoGNiI_-6EWQ",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8668296933174133,
+  "input_tokens": 702,
+  "output_tokens": 21,
+  "cost_usd": 0.004035
+ },
+ {
+  "venue_id": "ChIJG_7ZvpqFdUgRu_jOQP1vwkA",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.15,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7314281463623047,
+  "input_tokens": 691,
+  "output_tokens": 23,
+  "cost_usd": 0.00403
+ },
+ {
+  "venue_id": "ChIJ_____3SFdUgRCenk19Tce64",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.73389732837677,
+  "input_tokens": 700,
+  "output_tokens": 23,
+  "cost_usd": 0.004075
+ },
+ {
+  "venue_id": "ChIJdcjV86OFdUgRyHdnIv0t7JY",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8055198192596436,
+  "input_tokens": 691,
+  "output_tokens": 23,
+  "cost_usd": 0.00403
+ },
+ {
+  "venue_id": "ChIJN0k0rZ-FdUgR6oAZdweyxHc",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7284356355667114,
+  "input_tokens": 701,
+  "output_tokens": 21,
+  "cost_usd": 0.00403
+ },
+ {
+  "venue_id": "ChIJ858EB2qFdUgRtVBV8lP05Wo",
+  "vibes": [
+   "brunch",
+   "sit-down"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7335300445556641,
+  "input_tokens": 691,
+  "output_tokens": 27,
+  "cost_usd": 0.00413
+ },
+ {
+  "venue_id": "ChIJa365BgCFdUgRwlIagqskJR4",
+  "vibes": [
+   "sit-down",
+   "groups"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7710906863212585,
+  "input_tokens": 698,
+  "output_tokens": 26,
+  "cost_usd": 0.00414
+ },
+ {
+  "venue_id": "ChIJUy8PgDCFdUgRLPoMGP7QtM4",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7787778377532959,
+  "input_tokens": 699,
+  "output_tokens": 21,
+  "cost_usd": 0.00402
+ },
+ {
+  "venue_id": "ChIJHVqr-OCPdUgRMjNGHrF5Fqw",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7379227876663208,
+  "input_tokens": 699,
+  "output_tokens": 23,
+  "cost_usd": 0.00407
+ },
+ {
+  "venue_id": "ChIJw_qFFwuFdUgRQFRdRYIk4RI",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7544616460800171,
+  "input_tokens": 712,
+  "output_tokens": 23,
+  "cost_usd": 0.004135
+ },
+ {
+  "venue_id": "ChIJ7X1o_GKFdUgR4c0RKhrRcxQ",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8475443720817566,
+  "input_tokens": 693,
+  "output_tokens": 23,
+  "cost_usd": 0.00404
+ },
+ {
+  "venue_id": "ChIJG5tMfaOFdUgRuXZkU_C77v8",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.15,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7886238098144531,
+  "input_tokens": 683,
+  "output_tokens": 23,
+  "cost_usd": 0.00399
+ },
+ {
+  "venue_id": "ChIJ60S8owyFdUgRZZbe0_Rx4x0",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7350873947143555,
+  "input_tokens": 702,
+  "output_tokens": 21,
+  "cost_usd": 0.004035
+ },
+ {
+  "venue_id": "ChIJVfJWsJ2FdUgRtLIDZKVVIzk",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.4,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7708826661109924,
+  "input_tokens": 702,
+  "output_tokens": 21,
+  "cost_usd": 0.004035
+ },
+ {
+  "venue_id": "ChIJJ34hsp2FdUgR_0Y7RT1SAiE",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8228962421417236,
+  "input_tokens": 699,
+  "output_tokens": 23,
+  "cost_usd": 0.00407
+ },
+ {
+  "venue_id": "ChIJDz9_JrOFdUgRr1FQnjkXwE0",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7083207368850708,
+  "input_tokens": 702,
+  "output_tokens": 21,
+  "cost_usd": 0.004035
+ },
+ {
+  "venue_id": "ChIJt4FzKvqFdUgRZhZHB5STjVo",
+  "vibes": [
+   "coffee",
+   "work-friendly"
+  ],
+  "confidence": 0.5,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7016487121582031,
+  "input_tokens": 707,
+  "output_tokens": 28,
+  "cost_usd": 0.004235
+ },
+ {
+  "venue_id": "ChIJYa8XwDWFdUgRYBwC9ASXBe0",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.869590699672699,
+  "input_tokens": 704,
+  "output_tokens": 21,
+  "cost_usd": 0.004045
+ },
+ {
+  "venue_id": "ChIJWUALr2mFdUgRHmYPfQFV4nw",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.15,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7316511273384094,
+  "input_tokens": 694,
+  "output_tokens": 23,
+  "cost_usd": 0.004045
+ },
+ {
+  "venue_id": "ChIJAQDM76OFdUgRiXZyIOEwRMk",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7777477502822876,
+  "input_tokens": 704,
+  "output_tokens": 23,
+  "cost_usd": 0.004095
+ },
+ {
+  "venue_id": "ChIJzfPL7tGbdUgRQEUo6nnfx9w",
+  "vibes": [
+   "quick",
+   "sit-down"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7924377918243408,
+  "input_tokens": 699,
+  "output_tokens": 26,
+  "cost_usd": 0.004145
+ },
+ {
+  "venue_id": "ChIJVS9PW3SFdUgRTq4esn5-FR4",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.7792485952377319,
+  "input_tokens": 703,
+  "output_tokens": 23,
+  "cost_usd": 0.00409
+ },
+ {
+  "venue_id": "ChIJzXODAwCFdUgR02NcvaOZNWg",
+  "vibes": [
+   "quick"
+  ],
+  "confidence": 0.3,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8408886194229126,
+  "input_tokens": 697,
+  "output_tokens": 21,
+  "cost_usd": 0.00401
+ },
+ {
+  "venue_id": "ChIJLaleJwCFdUgRPVkNfkvOZrM",
+  "vibes": [
+   "sit-down"
+  ],
+  "confidence": 0.2,
+  "model": "claude-opus-4-8",
+  "prompt_version": "v1",
+  "cached": false,
+  "cache_similarity": 0.8361114263534546,
+  "input_tokens": 694,
+  "output_tokens": 23,
+  "cost_usd": 0.004045
+ }
+]
