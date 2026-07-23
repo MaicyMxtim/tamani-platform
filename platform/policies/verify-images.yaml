@@ -1,0 +1,32 @@
+# Supply chain enforcement: any image from our registry entering a
+# tamani namespace must carry a valid keyless signature produced by this
+# repository's CI on main. An unsigned or tampered image is refused at
+# admission. Third-party images (redis, nats) are out of scope here —
+# they are pinned by tag and vetted by Renovate instead.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-image-signatures
+spec:
+  validationFailureAction: Enforce
+  webhookTimeoutSeconds: 30
+  failurePolicy: Fail
+  rules:
+    - name: require-cosign-signature
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaceSelector:
+                matchExpressions:
+                  - { key: env, operator: In, values: [dev, staging, prod] }
+      verifyImages:
+        - imageReferences: ["ghcr.io/maicymxtim/*"]
+          failureAction: Enforce
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/MaicyMxtim/tamani-platform/.github/workflows/ci.yml@refs/heads/main"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev

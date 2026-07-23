@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://kyverno.github.io/kyverno/
+    chart: kyverno
+    targetRevision: 3.3.4
+    helm:
+      valuesObject:
+        # Admission control only on the small node — no background scans,
+        # no policy reports, single replica.
+        admissionController:
+          replicas: 1
+          container:
+            resources:
+              requests: { cpu: 50m, memory: 128Mi }
+              limits: { memory: 384Mi }
+        backgroundController: { enabled: false }
+        reportsController: { enabled: false }
+        cleanupController: { enabled: false }
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true, ServerSideApply=true]
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: policies
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MaicyMxtim/tamani-platform.git
+    targetRevision: main
+    path: platform/policies
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:
+      limit: 5
+      backoff: { duration: 30s, factor: 2 }
