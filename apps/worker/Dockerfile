@@ -7,6 +7,6 @@ FROM python:3.12-slim
 RUN useradd --uid 10001 --no-create-home appuser
 COPY --from=builder /install /usr/local
 WORKDIR /app
-COPY main.py .
+COPY main.py replay.py ./
 USER 10001
 CMD ["python", "main.py"]
