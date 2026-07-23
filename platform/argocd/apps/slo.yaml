@@ -1,0 +1,21 @@
+# Wave 1: needs the ServiceMonitor/PrometheusRule CRDs from monitoring.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: slo
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:MaicyMxtim/tamani-platform.git
+    targetRevision: main
+    path: platform/k8s/slo
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    retry:
+      limit: 5
+      backoff: { duration: 30s, factor: 2 }

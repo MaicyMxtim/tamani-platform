@@ -1,0 +1,25 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tamani-api
+  namespace: tamani-prod
+spec:
+  selector:
+    matchLabels: { app: tamani-api }
+  endpoints:
+    - targetPort: 8000
+      path: /metrics
+      interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tamani-gateway
+  namespace: tamani-prod
+spec:
+  selector:
+    matchLabels: { app: tamani-gateway }
+  endpoints:
+    - targetPort: 8001
+      path: /metrics
+      interval: 30s

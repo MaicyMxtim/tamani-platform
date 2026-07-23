@@ -55,6 +55,9 @@ TENANT_KEYS = {
 
 CACHE_HITS = Counter("gateway_cache_hits_total", "Semantic cache hits")
 CACHE_MISSES = Counter("gateway_cache_misses_total", "Semantic cache misses")
+SPEND = Counter("gateway_spend_usd_total", "Provider spend in USD", ["purpose"])
+SAVED = Counter("gateway_saved_usd_total", "Spend avoided by the cache")
+TOKENS = Counter("gateway_tokens_total", "Provider tokens", ["purpose", "direction"])
 
 
 def _redis():
@@ -103,6 +106,10 @@ class ClassifyResponse(BaseModel):
 
 def ledger(r, tenant_id: str, result: dict, cached: bool):
     saved = provider.cost_usd(provider.MODEL, 350, 40) if cached else 0.0
+    SPEND.labels("classification").inc(result["cost_usd"])
+    SAVED.inc(saved)
+    TOKENS.labels("classification", "in").inc(result["input_tokens"])
+    TOKENS.labels("classification", "out").inc(result["output_tokens"])
     r.xadd("cost:ledger", {
         "tenant": tenant_id,
         "model": result["model"],
@@ -183,6 +190,9 @@ def complete(req: CompleteRequest, tenant_id: str = Depends(tenant)):
         log.error("completion failed: %s", exc)
         raise HTTPException(status_code=502, detail="provider unavailable")
     budget.consume(r, tenant_id, result["input_tokens"] + result["output_tokens"])
+    SPEND.labels(req.purpose).inc(result["cost_usd"])
+    TOKENS.labels(req.purpose, "in").inc(result["input_tokens"])
+    TOKENS.labels(req.purpose, "out").inc(result["output_tokens"])
     r.xadd("cost:ledger", {
         "tenant": tenant_id, "model": result["model"], "purpose": req.purpose,
         "cached": 0, "input_tokens": result["input_tokens"],
