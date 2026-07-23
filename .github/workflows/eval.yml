@@ -1,0 +1,43 @@
+name: eval-gate
+
+# The accuracy gate: any change to the classifier's prompt or code is
+# scored against the golden set, and a regression beyond tolerance fails
+# the workflow. Costs ~$0.60 per run, so it only triggers on relevant paths.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/gateway/**"
+      - "evals/golden_set.jsonl"
+      - "evals/run_eval.py"
+      - "evals/check_gate.py"
+      - "evals/baseline.json"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install gateway deps
+        run: pip install -q -r apps/gateway/requirements.txt
+      - name: start gateway
+        working-directory: apps/gateway
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          nohup uvicorn main:app --port 8001 &
+          for i in $(seq 1 30); do
+            curl -fsS http://localhost:8001/health/ready && break || sleep 2
+          done
+      - name: run eval
+        run: python3 evals/run_eval.py
+      - name: regression gate
+        run: python3 evals/check_gate.py

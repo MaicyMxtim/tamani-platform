@@ -30,8 +30,13 @@ PRICING = {
     "mock-classifier-v0": (0.0, 0.0),
 }
 
-_PROMPT_FILE = Path(__file__).parent / "prompts" / "classify_v1.md"
-PROMPT_VERSION = _PROMPT_FILE.stem.rsplit("_", 1)[-1]  # "v1"
+# Highest-versioned prompt wins; each is an immutable artifact in Git and
+# the version is recorded on every classification (and cache namespace).
+_PROMPT_FILE = sorted(
+    (Path(__file__).parent / "prompts").glob("classify_v*.md"),
+    key=lambda p: int(p.stem.rsplit("_v", 1)[-1]),
+)[-1]
+PROMPT_VERSION = "v" + _PROMPT_FILE.stem.rsplit("_v", 1)[-1]
 SYSTEM_PROMPT = _PROMPT_FILE.read_text()
 
 OUTPUT_SCHEMA = {

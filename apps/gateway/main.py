@@ -84,6 +84,8 @@ def tenant(x_api_key: str = Header(default="")) -> str:
 class ClassifyRequest(BaseModel):
     venue_id: str
     description: str = Field(min_length=1, max_length=4000)
+    # Evals set this so they measure the model, never the cache.
+    bypass_cache: bool = False
 
 
 class ClassifyResponse(BaseModel):
@@ -126,7 +128,8 @@ def classify(req: ClassifyRequest, tenant_id: str = Depends(tenant)):
         )
 
     vec = semcache.embed(req.description)
-    hit, similarity = semcache.lookup(r, provider.PROMPT_VERSION, vec)
+    hit, similarity = (None, 0.0) if req.bypass_cache else \
+        semcache.lookup(r, provider.PROMPT_VERSION, vec)
     if hit is not None:
         CACHE_HITS.inc()
         cached_result = {**hit, "input_tokens": 0, "output_tokens": 0,
@@ -143,7 +146,7 @@ def classify(req: ClassifyRequest, tenant_id: str = Depends(tenant)):
     budget.consume(r, tenant_id, result["input_tokens"] + result["output_tokens"])
     # Never cache fallback output: a mock answer served during an outage
     # must not keep being served after the provider recovers.
-    if result["model"] != "mock-classifier-v0":
+    if result["model"] != "mock-classifier-v0" and not req.bypass_cache:
         semcache.store(r, provider.PROMPT_VERSION, req.description, vec, {
             "vibes": result["vibes"],
             "confidence": result["confidence"],
