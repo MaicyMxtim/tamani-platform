@@ -4,28 +4,26 @@ An agentic infrastructure project: the Tamani venue discovery backend run as a
 production-grade internal platform on Kubernetes, delivered by GitOps, with a
 governed inference gateway and agentic workloads under evaluation gates.
 
-The full plan lives in `docs/`. Build status by phase:
+Live at **https://platform.waypear.com**. Full plan and evidence in `docs/`.
+All twelve phases complete; every headline number is measured, not claimed.
 
-| Phase | Status |
-|---|---|
-| 0. Foundation and repository structure | done except remote state (awaits AWS) |
-| 1. Containerisation and the workload | done |
-| 2. The Kubernetes platform | done on minikube; cloud env awaits AWS |
-| 3–11 | not started |
+| Phase | Status | Evidence |
+|---|---|---|
+| 0. Foundation & repo | done | Terraform on AWS, zero-drift check |
+| 1. Containerisation | done | multi-stage, non-root, images under 200 MB |
+| 2. Kubernetes platform | done | tenancy, RBAC, default-deny netpol, Kyverno |
+| 3. GitOps delivery | done | Argo app-of-apps, manual prod gate, sha pinning |
+| 4. Event backbone | done | NATS delivery semantics, all failure modes proven |
+| 5. Inference gateway | done | real Opus, semantic cache, quotas, ~$4/1k live |
+| 6. Governed agents | done | manifest/budget/loop/dry-run; ops agent opened PR #1 |
+| 7. Observability & SLOs | done | Prometheus/Grafana/Loki, burn-rate alerts |
+| 8. Security & supply chain | done | cosign signing enforced, Trivy, SBOM, ESO |
+| 9. Reliability proof | done | 3 postmortems, chaos with stated hypotheses |
+| 10. Developer self-service | done | `tamani new` → serving in 195s, measured |
+| 11. Cost & unit economics | done | tiering experiment, crossover, $/1k published |
 
-Phase 2 verified on minikube (Calico CNI): restricted Pod Security on all
-namespaces, default-deny NetworkPolicy with explicit paths, developer and
-deployer RBAC personas, ResourceQuota + LimitRange per environment, and
-Kyverno rejecting latest tags, missing limits and missing app labels at
-admission. Deploy locally with:
-
-```
-minikube start --cni=calico --memory=6g --cpus=4
-kubectl apply -f platform/k8s/tenancy/
-kubectl apply -k platform/k8s/overlays/dev
-helm install kyverno kyverno/kyverno -n kyverno --create-namespace
-kubectl apply -f platform/policies/baseline.yaml
-```
+Key evidence documents: `docs/unit-economics.md`, `runbooks/postmortems/`,
+`runbooks/chaos/`, `runbooks/golden-path.md`, `docs/adr/`.
 
 ## Repository layout
 
