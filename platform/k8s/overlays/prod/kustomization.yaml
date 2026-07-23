@@ -8,15 +8,13 @@ resources:
 images:
   - name: tamani-api
     newName: ghcr.io/maicymxtim/tamani-api
-    newTag: 01734e5aa54037a8b99c451952c344a950948fcf
+    newTag: 53990bb3b38e18d405116443afe84499deaebb8f
   - name: tamani-gateway
     newName: ghcr.io/maicymxtim/tamani-gateway
-    newTag: 01734e5aa54037a8b99c451952c344a950948fcf
+    newTag: 53990bb3b38e18d405116443afe84499deaebb8f
   - name: tamani-worker
     newName: ghcr.io/maicymxtim/tamani-worker
-    newTag: 01734e5aa54037a8b99c451952c344a950948fcf
-# Single replicas while the node is a 2 GB t3.small; returns to 2 with
-# the t3.medium upgrade when the observability stack lands (Phase 7).
+    newTag: 53990bb3b38e18d405116443afe84499deaebb8f
 # maxSurge 0: on a one-node cluster a deploy surge doubles memory and
 # took the node down (postmortem 2026-07-23). Replace, don't surge.
 patches:
@@ -36,11 +34,26 @@ patches:
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 1
+        value: 2
+  # The real gateway needs the provider key (cluster secret, never in Git)
+  # and more memory for the embedding model.
   - target:
       kind: Deployment
       name: tamani-gateway
     patch: |
       - op: replace
         path: /spec/replicas
-        value: 1
+        value: 2
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: anthropic
+              key: api-key
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests: { cpu: 100m, memory: 384Mi }
+          limits: { cpu: "1", memory: 768Mi }
