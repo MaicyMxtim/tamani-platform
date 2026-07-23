@@ -55,6 +55,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: tamani-gateway
+  labels: { app: tamani-gateway }
 spec:
   selector: { app: tamani-gateway }
   ports: [{ port: 80, targetPort: 8001 }]
