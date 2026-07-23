@@ -1,0 +1,10 @@
+# At least one API replica must survive any voluntary disruption
+# (drain, eviction, chaos experiment).
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tamani-api
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: { app: tamani-api }
