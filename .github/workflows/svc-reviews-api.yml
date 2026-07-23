@@ -1,0 +1,46 @@
+name: svc-reviews-api
+
+on:
+  push:
+    branches: [main]
+    paths: ["apps/reviews-api/**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        id: build
+        with:
+          context: apps/reviews-api
+          push: true
+          tags: |
+            ghcr.io/maicymxtim/reviews-api:${{ github.sha }}
+            ghcr.io/maicymxtim/reviews-api:main
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: trivy vulnerability scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/maicymxtim/reviews-api:${{ github.sha }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: sbom
+        uses: anchore/sbom-action@v0.17.8
+        with:
+          image: ghcr.io/maicymxtim/reviews-api:${{ github.sha }}
+          artifact-name: sbom-reviews-api.spdx.json
+      - uses: sigstore/cosign-installer@v3.7.0
+      - run: cosign sign --yes ghcr.io/maicymxtim/reviews-api@${{ steps.build.outputs.digest }}
