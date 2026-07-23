@@ -8,13 +8,13 @@ resources:
 images:
   - name: tamani-api
     newName: ghcr.io/maicymxtim/tamani-api
-    newTag: 53990bb3b38e18d405116443afe84499deaebb8f
+    newTag: 8e543eff8e45ef37a702a44b1d3132cc34e03a42
   - name: tamani-gateway
     newName: ghcr.io/maicymxtim/tamani-gateway
-    newTag: 53990bb3b38e18d405116443afe84499deaebb8f
+    newTag: 8e543eff8e45ef37a702a44b1d3132cc34e03a42
   - name: tamani-worker
     newName: ghcr.io/maicymxtim/tamani-worker
-    newTag: 53990bb3b38e18d405116443afe84499deaebb8f
+    newTag: 8e543eff8e45ef37a702a44b1d3132cc34e03a42
 # maxSurge 0: on a one-node cluster a deploy surge doubles memory and
 # took the node down (postmortem 2026-07-23). Replace, don't surge.
 patches:
