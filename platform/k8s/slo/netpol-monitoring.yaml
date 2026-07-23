@@ -1,0 +1,18 @@
+# Prometheus lives in the monitoring namespace; the prod default-deny
+# would silently break scraping. Open exactly the metrics ports.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-prometheus-scrape
+  namespace: tamani-prod
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 8000
+        - port: 8001
