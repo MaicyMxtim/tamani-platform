@@ -141,11 +141,14 @@ def classify(req: ClassifyRequest, tenant_id: str = Depends(tenant)):
     CACHE_MISSES.inc()
     result = provider.classify(req.description)
     budget.consume(r, tenant_id, result["input_tokens"] + result["output_tokens"])
-    semcache.store(r, provider.PROMPT_VERSION, req.description, vec, {
-        "vibes": result["vibes"],
-        "confidence": result["confidence"],
-        "model": result["model"],
-    })
+    # Never cache fallback output: a mock answer served during an outage
+    # must not keep being served after the provider recovers.
+    if result["model"] != "mock-classifier-v0":
+        semcache.store(r, provider.PROMPT_VERSION, req.description, vec, {
+            "vibes": result["vibes"],
+            "confidence": result["confidence"],
+            "model": result["model"],
+        })
     ledger(r, tenant_id, result, cached=False)
     log.info("classified venue %s via %s ($%.6f)", req.venue_id,
              result["model"], result["cost_usd"])
