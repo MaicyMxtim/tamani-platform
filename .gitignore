@@ -9,3 +9,4 @@ __pycache__/
 node_modules/
 terraform.tfvars
 docs/the-story-so-far.md
+results/latest.json

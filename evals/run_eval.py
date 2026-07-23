@@ -76,12 +76,14 @@ print(f"\nmicro precision {micro_p:.1%}  micro recall {micro_r:.1%}  "
 out_dir = ROOT / "results"
 out_dir.mkdir(exist_ok=True)
 stamp = time.strftime("%Y%m%d-%H%M%S")
-json.dump({
+result = {
     "timestamp": stamp,
     "micro_precision": round(micro_p, 4), "micro_recall": round(micro_r, 4),
     "spend_usd": round(spend, 4), "n": len(golden),
     "per_tag": {t: {"tp": tp[t], "fp": fp[t], "fn": fn[t]}
                 for t in sorted(set(tp) | set(fp) | set(fn))},
     "predictions": predictions,
-}, open(out_dir / f"eval-{stamp}.json", "w"), indent=1)
-print(f"saved results/eval-{stamp}.json")
+}
+json.dump(result, open(out_dir / f"eval-{stamp}.json", "w"), indent=1)
+json.dump(result, open(out_dir / "latest.json", "w"), indent=1)
+print(f"saved results/eval-{stamp}.json (and results/latest.json)")
