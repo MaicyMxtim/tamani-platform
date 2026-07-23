@@ -13,7 +13,7 @@ TOLERANCE = 0.03  # absolute points
 
 ROOT = Path(__file__).resolve().parent
 baseline = json.load(open(ROOT / "baseline.json"))
-latest_file = sorted((ROOT / "results").glob("eval-*.json"))[-1]
+latest_file = ROOT / "results" / "latest.json"
 latest = json.load(open(latest_file))
 
 print(f"baseline: P {baseline['micro_precision']:.1%} R {baseline['micro_recall']:.1%}")
