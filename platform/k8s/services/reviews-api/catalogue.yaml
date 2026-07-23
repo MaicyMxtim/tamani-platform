@@ -1,0 +1,8 @@
+name: reviews-api
+owner: maicy
+scaffolded: "2026-07-23"
+golden_path: "gp-1.0.0"
+runbook: runbooks/reviews-api.md
+namespace: tamani-dev
+port: 8000
+dependencies: []
