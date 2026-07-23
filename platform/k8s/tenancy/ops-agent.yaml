@@ -1,0 +1,44 @@
+# The operations agent's identity: get, list, watch — and no write verb
+# anywhere. Least privilege at the infrastructure boundary, not just the
+# application one.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ops-agent
+  namespace: tamani-dev
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ops-agent-readonly
+rules:
+  - apiGroups: [""]
+    resources: [pods, pods/log, events, services, endpoints, configmaps]
+    verbs: [get, list, watch]
+  - apiGroups: [apps]
+    resources: [deployments, replicasets, statefulsets]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ops-agent
+  namespace: tamani-dev
+subjects:
+  - { kind: ServiceAccount, name: ops-agent, namespace: tamani-dev }
+roleRef:
+  kind: ClusterRole
+  name: ops-agent-readonly
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ops-agent
+  namespace: tamani-prod
+subjects:
+  - { kind: ServiceAccount, name: ops-agent, namespace: tamani-dev }
+roleRef:
+  kind: ClusterRole
+  name: ops-agent-readonly
+  apiGroup: rbac.authorization.k8s.io

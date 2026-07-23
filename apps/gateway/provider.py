@@ -129,6 +129,39 @@ def classify_anthropic(description: str) -> dict:
     }
 
 
+def complete(prompt: str, max_tokens: int = 1500) -> dict:
+    """Generic completion for agent reasoning. No cache, budgeted like
+    everything else, cost attributed by purpose in the ledger."""
+    import anthropic
+
+    if breaker.open:
+        raise CircuitOpen("anthropic circuit open")
+    client = anthropic.Anthropic()
+    try:
+        response = client.messages.create(
+            model=MODEL,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
+        )
+    except (anthropic.APIConnectionError, anthropic.RateLimitError,
+            anthropic.InternalServerError):
+        breaker.record_failure()
+        raise
+    if response.stop_reason == "refusal":
+        breaker.record_success()
+        raise ValueError("provider refused the request")
+    breaker.record_success()
+    text = next(b.text for b in response.content if b.type == "text")
+    return {
+        "text": text,
+        "model": response.model,
+        "input_tokens": response.usage.input_tokens,
+        "output_tokens": response.usage.output_tokens,
+        "cost_usd": cost_usd(MODEL, response.usage.input_tokens,
+                             response.usage.output_tokens),
+    }
+
+
 def classify_mock(description: str) -> dict:
     """Deterministic fallback: keyword match, zero cost, low confidence."""
     text = description.lower()

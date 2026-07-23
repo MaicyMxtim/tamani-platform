@@ -161,6 +161,37 @@ def classify(req: ClassifyRequest, tenant_id: str = Depends(tenant)):
     )
 
 
+class CompleteRequest(BaseModel):
+    prompt: str = Field(min_length=1, max_length=30000)
+    purpose: str = Field(default="agent-reasoning", max_length=40)
+    max_tokens: int = Field(default=1500, le=3000)
+
+
+@app.post("/v1/complete")
+def complete(req: CompleteRequest, tenant_id: str = Depends(tenant)):
+    """Agent reasoning goes through the same door as everything else:
+    tenant budgets, ledger attribution by purpose, no provider key in
+    any agent."""
+    r = _redis()
+    allowed, retry_after = budget.check(r, tenant_id)
+    if not allowed:
+        raise HTTPException(status_code=429, detail="token budget exhausted",
+                            headers={"retry-after": str(retry_after)})
+    try:
+        result = provider.complete(req.prompt, req.max_tokens)
+    except Exception as exc:  # noqa: BLE001
+        log.error("completion failed: %s", exc)
+        raise HTTPException(status_code=502, detail="provider unavailable")
+    budget.consume(r, tenant_id, result["input_tokens"] + result["output_tokens"])
+    r.xadd("cost:ledger", {
+        "tenant": tenant_id, "model": result["model"], "purpose": req.purpose,
+        "cached": 0, "input_tokens": result["input_tokens"],
+        "output_tokens": result["output_tokens"],
+        "cost_usd": f"{result['cost_usd']:.8f}", "saved_usd": "0",
+    })
+    return result
+
+
 @app.get("/v1/costs")
 def costs(tenant_id: str = Depends(tenant)):
     """Spend and savings summary from the ledger."""

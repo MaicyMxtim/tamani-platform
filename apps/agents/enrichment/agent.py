@@ -17,6 +17,8 @@ from pathlib import Path
 import httpx
 import redis as redis_lib
 
+import sys as _sys; from pathlib import Path as _P
+_sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
 from governance import GovernanceViolation, Governor
 
 GATEWAY = os.getenv("GATEWAY_URL", "http://localhost:8001")

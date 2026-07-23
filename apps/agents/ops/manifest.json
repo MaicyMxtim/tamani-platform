@@ -1,0 +1,13 @@
+{
+  "agent": "ops",
+  "description": "First-line incident triage: inspects the cluster read-only, retrieves runbooks, produces a diagnosis with evidence and opens a pull request. Never applies changes.",
+  "allowed_tools": ["k8s_inspect", "runbook_lookup", "diagnose", "open_pr"],
+  "budgets": {
+    "max_tokens_per_run": 15000,
+    "max_wall_clock_seconds": 240,
+    "max_tool_calls": 25
+  },
+  "loop_detection": {
+    "identical_call_limit": 2
+  }
+}
