@@ -17,7 +17,19 @@ images:
     newTag: 01734e5aa54037a8b99c451952c344a950948fcf
 # Single replicas while the node is a 2 GB t3.small; returns to 2 with
 # the t3.medium upgrade when the observability stack lands (Phase 7).
+# maxSurge 0: on a one-node cluster a deploy surge doubles memory and
+# took the node down (postmortem 2026-07-23). Replace, don't surge.
 patches:
+  - target:
+      kind: Deployment
+    patch: |
+      - op: add
+        path: /spec/strategy
+        value:
+          type: RollingUpdate
+          rollingUpdate:
+            maxSurge: 0
+            maxUnavailable: 1
   - target:
       kind: Deployment
       name: tamani-api
