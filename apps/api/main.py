@@ -83,6 +83,21 @@ async def correlation(request: Request, call_next):
     return response
 
 
+@app.get("/", include_in_schema=False)
+def root():
+    """Friendly landing so the bare domain isn't a 404."""
+    return {
+        "service": SERVICE_NAME,
+        "status": "live",
+        "venues": len(_static_venues()),
+        "try": {
+            "interactive_docs": "/docs",
+            "search": "/venues?vibe=late-night",
+            "feed": "/feed?limit=10",
+        },
+    }
+
+
 @app.get("/health/live")
 def liveness():
     """Only proves the process responds. No dependency checks here."""
