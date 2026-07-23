@@ -35,11 +35,6 @@ spec:
           sidecar:
             dashboards: { enabled: true, searchNamespace: ALL }
           additionalDataSources:
-            - name: Prometheus
-              type: prometheus
-              uid: prometheus
-              isDefault: true
-              url: http://monitoring-kube-prometheus-prometheus:9090
             - name: Loki
               type: loki
               uid: loki
