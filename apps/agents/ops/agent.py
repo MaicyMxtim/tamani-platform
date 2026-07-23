@@ -15,7 +15,7 @@ import sys
 import time
 from pathlib import Path
 
-import httpx
+import urllib.request
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from governance import GovernanceViolation, Governor  # noqa: E402
@@ -64,12 +64,12 @@ Respond in markdown with exactly these sections:
 ## Root cause (cite specific evidence lines)
 ## Proposed remediation (the change a human should review and apply)
 ## Confidence (high/medium/low, one sentence why)"""
-    resp = httpx.post(f"{GATEWAY}/v1/complete",
-                      json={"prompt": prompt, "purpose": "ops-triage",
-                            "max_tokens": 1200},
-                      headers={"x-api-key": GATEWAY_KEY}, timeout=300)
-    resp.raise_for_status()
-    return resp.json()
+    req = urllib.request.Request(
+        f"{GATEWAY}/v1/complete",
+        data=json.dumps({"prompt": prompt, "purpose": "ops-triage",
+                         "max_tokens": 1200}).encode(),
+        headers={"x-api-key": GATEWAY_KEY, "content-type": "application/json"})
+    return json.load(urllib.request.urlopen(req, timeout=300))
 
 
 def open_pr(alert_name: str, diagnosis: str) -> dict:

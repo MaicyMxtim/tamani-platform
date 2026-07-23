@@ -1,0 +1,62 @@
+# The service level objectives, as code.
+#
+#   Availability: 99.5% of API requests succeed, over 30 days.
+#   Latency:      95% of API requests complete under 400 ms.
+#
+# Alerting is multi-window multi-burn-rate: a fast burn (would spend 2%+
+# of the monthly error budget in an hour) pages immediately; a slow burn
+# (10% over three days) raises a ticket. This removes most alert noise:
+# a blip trips neither, a real fire trips the fast pair.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tamani-slo
+  namespace: tamani-prod
+spec:
+  groups:
+    - name: tamani.slo.recording
+      interval: 30s
+      rules:
+        - record: tamani:api_error_ratio:rate5m
+          expr: |
+            sum(rate(http_requests_total{namespace="tamani-prod", status=~"5.."}[5m]))
+            / clamp_min(sum(rate(http_requests_total{namespace="tamani-prod"}[5m])), 1e-9)
+        - record: tamani:api_error_ratio:rate1h
+          expr: |
+            sum(rate(http_requests_total{namespace="tamani-prod", status=~"5.."}[1h]))
+            / clamp_min(sum(rate(http_requests_total{namespace="tamani-prod"}[1h])), 1e-9)
+        - record: tamani:api_error_ratio:rate6h
+          expr: |
+            sum(rate(http_requests_total{namespace="tamani-prod", status=~"5.."}[6h]))
+            / clamp_min(sum(rate(http_requests_total{namespace="tamani-prod"}[6h])), 1e-9)
+        - record: tamani:api_p95_seconds:rate10m
+          expr: |
+            histogram_quantile(0.95, sum by (le)
+              (rate(http_request_duration_seconds_bucket{namespace="tamani-prod", handler!="/metrics"}[10m])))
+
+    - name: tamani.slo.alerts
+      rules:
+        - alert: TamaniErrorBudgetFastBurn
+          expr: |
+            tamani:api_error_ratio:rate5m > (14.4 * 0.005)
+            and tamani:api_error_ratio:rate1h > (14.4 * 0.005)
+          for: 2m
+          labels: { severity: critical, namespace: tamani-prod }
+          annotations:
+            summary: "API burning >2% of monthly error budget per hour"
+            runbook: runbooks/TamaniErrorBudgetFastBurn.md
+        - alert: TamaniErrorBudgetSlowBurn
+          expr: |
+            tamani:api_error_ratio:rate6h > (1.0 * 0.005)
+          for: 30m
+          labels: { severity: warning, namespace: tamani-prod }
+          annotations:
+            summary: "API error rate would exhaust monthly budget"
+            runbook: runbooks/TamaniErrorBudgetFastBurn.md
+        - alert: TamaniLatencySLOBreach
+          expr: tamani:api_p95_seconds:rate10m > 0.4
+          for: 15m
+          labels: { severity: warning, namespace: tamani-prod }
+          annotations:
+            summary: "API p95 latency above the 400ms objective"
+            runbook: runbooks/TamaniLatencySLOBreach.md

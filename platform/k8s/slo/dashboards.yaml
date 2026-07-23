@@ -1,0 +1,62 @@
+# Two dashboards, loaded by Grafana's sidecar: one for service health,
+# one for AI spend. Split by audience per the plan.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-tamani-service
+  namespace: tamani-prod
+  labels: { grafana_dashboard: "1" }
+data:
+  tamani-service.json: |
+    {"title": "Tamani — Service Health", "uid": "tamani-svc", "timezone": "browser",
+     "time": {"from": "now-6h", "to": "now"}, "refresh": "30s", "schemaVersion": 39,
+     "panels": [
+      {"type": "stat", "title": "Availability (5m)", "gridPos": {"x":0,"y":0,"w":6,"h":5},
+       "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 3,
+         "thresholds": {"steps": [{"color":"red","value":null},{"color":"yellow","value":0.99},{"color":"green","value":0.995}]}}},
+       "targets": [{"expr": "1 - tamani:api_error_ratio:rate5m"}]},
+      {"type": "stat", "title": "p95 latency", "gridPos": {"x":6,"y":0,"w":6,"h":5},
+       "fieldConfig": {"defaults": {"unit": "s", "decimals": 3,
+         "thresholds": {"steps": [{"color":"green","value":null},{"color":"red","value":0.4}]}}},
+       "targets": [{"expr": "tamani:api_p95_seconds:rate10m"}]},
+      {"type": "stat", "title": "Error budget left (30d, 99.5%)", "gridPos": {"x":12,"y":0,"w":6,"h":5},
+       "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 1,
+         "thresholds": {"steps": [{"color":"red","value":null},{"color":"yellow","value":0.2},{"color":"green","value":0.5}]}}},
+       "targets": [{"expr": "clamp_min(1 - (sum(increase(http_requests_total{namespace=\"tamani-prod\", status=~\"5..\"}[30d])) / clamp_min(sum(increase(http_requests_total{namespace=\"tamani-prod\"}[30d])) * 0.005, 1e-9)), 0)"}]},
+      {"type": "stat", "title": "Pod restarts (24h)", "gridPos": {"x":18,"y":0,"w":6,"h":5},
+       "targets": [{"expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"tamani-.*\"}[24h]))"}]},
+      {"type": "timeseries", "title": "Request rate by status", "gridPos": {"x":0,"y":5,"w":12,"h":8},
+       "targets": [{"expr": "sum by (status) (rate(http_requests_total{namespace=\"tamani-prod\"}[5m]))", "legendFormat": "{{status}}"}]},
+      {"type": "timeseries", "title": "Node memory working set", "gridPos": {"x":12,"y":5,"w":12,"h":8},
+       "fieldConfig": {"defaults": {"unit": "bytes"}},
+       "targets": [{"expr": "sum(container_memory_working_set_bytes{id=\"/\"})", "legendFormat": "used"}]}
+     ]}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dashboard-tamani-spend
+  namespace: tamani-prod
+  labels: { grafana_dashboard: "1" }
+data:
+  tamani-spend.json: |
+    {"title": "Tamani — AI Spend", "uid": "tamani-spend", "timezone": "browser",
+     "time": {"from": "now-24h", "to": "now"}, "refresh": "1m", "schemaVersion": 39,
+     "panels": [
+      {"type": "stat", "title": "Spend (24h)", "gridPos": {"x":0,"y":0,"w":6,"h":5},
+       "fieldConfig": {"defaults": {"unit": "currencyUSD", "decimals": 4}},
+       "targets": [{"expr": "sum(increase(gateway_spend_usd_total[24h]))"}]},
+      {"type": "stat", "title": "Saved by cache (24h)", "gridPos": {"x":6,"y":0,"w":6,"h":5},
+       "fieldConfig": {"defaults": {"unit": "currencyUSD", "decimals": 4}},
+       "targets": [{"expr": "sum(increase(gateway_saved_usd_total[24h]))"}]},
+      {"type": "stat", "title": "Cache hit rate (24h)", "gridPos": {"x":12,"y":0,"w":6,"h":5},
+       "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 1}},
+       "targets": [{"expr": "sum(increase(gateway_cache_hits_total[24h])) / clamp_min(sum(increase(gateway_cache_hits_total[24h])) + sum(increase(gateway_cache_misses_total[24h])), 1)"}]},
+      {"type": "stat", "title": "Tokens (24h)", "gridPos": {"x":18,"y":0,"w":6,"h":5},
+       "targets": [{"expr": "sum(increase(gateway_tokens_total[24h]))"}]},
+      {"type": "timeseries", "title": "Spend by purpose ($/h)", "gridPos": {"x":0,"y":5,"w":12,"h":8},
+       "fieldConfig": {"defaults": {"unit": "currencyUSD"}},
+       "targets": [{"expr": "sum by (purpose) (increase(gateway_spend_usd_total[1h]))", "legendFormat": "{{purpose}}"}]},
+      {"type": "timeseries", "title": "Tokens by purpose", "gridPos": {"x":12,"y":5,"w":12,"h":8},
+       "targets": [{"expr": "sum by (purpose, direction) (increase(gateway_tokens_total[1h]))", "legendFormat": "{{purpose}} {{direction}}"}]}
+     ]}
