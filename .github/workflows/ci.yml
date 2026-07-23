@@ -65,7 +65,7 @@ jobs:
       # Fail the build on fixable critical vulnerabilities. Exceptions go
       # in .trivyignore with an expiry comment — explicit and time-limited.
       - name: trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.OWNER }}/tamani-${{ matrix.app }}:${{ github.sha }}
           severity: CRITICAL
