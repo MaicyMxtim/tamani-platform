@@ -8,13 +8,13 @@ resources:
 images:
   - name: tamani-api
     newName: ghcr.io/maicymxtim/tamani-api
-    newTag: main
+    newTag: 01734e5aa54037a8b99c451952c344a950948fcf
   - name: tamani-gateway
     newName: ghcr.io/maicymxtim/tamani-gateway
-    newTag: main
+    newTag: 01734e5aa54037a8b99c451952c344a950948fcf
   - name: tamani-worker
     newName: ghcr.io/maicymxtim/tamani-worker
-    newTag: main
+    newTag: 01734e5aa54037a8b99c451952c344a950948fcf
 # Single replicas while the node is a 2 GB t3.small; returns to 2 with
 # the t3.medium upgrade when the observability stack lands (Phase 7).
 patches:
