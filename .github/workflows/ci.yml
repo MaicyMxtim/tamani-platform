@@ -10,6 +10,16 @@ env:
   OWNER: maicymxtim
 
 jobs:
+  secrets-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -29,6 +39,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write   # cosign keyless signing
     strategy:
       matrix:
         app: [api, gateway, worker]
@@ -41,6 +52,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v6
+        id: build
         with:
           context: apps/${{ matrix.app }}
           push: true
@@ -49,3 +61,24 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.OWNER }}/tamani-${{ matrix.app }}:main
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Fail the build on fixable critical vulnerabilities. Exceptions go
+      # in .trivyignore with an expiry comment — explicit and time-limited.
+      - name: trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.OWNER }}/tamani-${{ matrix.app }}:${{ github.sha }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          trivyignores: .trivyignore
+
+      - name: sbom
+        uses: anchore/sbom-action@v0.17.8
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.OWNER }}/tamani-${{ matrix.app }}:${{ github.sha }}
+          artifact-name: sbom-tamani-${{ matrix.app }}.spdx.json
+
+      - name: cosign sign (keyless)
+        uses: sigstore/cosign-installer@v3.7.0
+      - run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.OWNER }}/tamani-${{ matrix.app }}@${{ steps.build.outputs.digest }}
