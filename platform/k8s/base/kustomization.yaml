@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - netpol-default.yaml
   - api/api.yaml
+  - api/pdb.yaml
   - gateway/gateway.yaml
   - worker/worker.yaml
   - redis/redis.yaml
