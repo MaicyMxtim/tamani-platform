@@ -1,6 +1,8 @@
 """Prove the governance runtime refuses what it must refuse."""
 import json
 
+import sys as _sys; from pathlib import Path as _P
+_sys.path.insert(0, str(_P(__file__).resolve().parents[1]))
 from governance import GovernanceViolation, Governor
 
 MANIFEST = json.load(open("manifest.json"))
