@@ -150,7 +150,7 @@ data:
           "type": "prometheus",
           "uid": "prometheus"
          },
-         "expr": "clamp_min(1 - (sum(increase(http_requests_total{namespace=\"tamani-prod\", status=~\"5..\"}[30d])) / clamp_min(sum(increase(http_requests_total{namespace=\"tamani-prod\"}[30d])) * 0.005, 1e-9)), 0)"
+         "expr": "clamp_min(1 - ((sum(increase(http_requests_total{namespace=\"tamani-prod\", status=~\"5..\"}[30d])) or vector(0)) / clamp_min(sum(increase(http_requests_total{namespace=\"tamani-prod\"}[30d])) * 0.005, 1e-9)), 0)"
         }
        ],
        "fieldConfig": {
@@ -274,7 +274,7 @@ data:
           "type": "prometheus",
           "uid": "prometheus"
          },
-         "expr": "sum(container_memory_working_set_bytes{id=\"/\"})",
+         "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
          "legendFormat": "used"
         }
        ],
