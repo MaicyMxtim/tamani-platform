@@ -16,7 +16,7 @@ services:
     ports: ["8001:8001"]
     environment:
       REDIS_URL: redis://redis:6379/0
-      TENANT_KEYS: "dev:dev-local-key,mobile:mobile-local-key"
+      TENANT_KEYS: "dev:dev-local-key,mobile:mobile-local-key,agents:agent-local-key"
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     depends_on: [redis]
 

@@ -1,0 +1,14 @@
+{
+  "agent": "enrichment",
+  "description": "Classifies venues via the gateway and writes results, routing low-confidence output to human review.",
+  "allowed_tools": ["lookup_venue", "classify", "write_classification", "queue_review"],
+  "budgets": {
+    "max_tokens_per_run": 20000,
+    "max_wall_clock_seconds": 300,
+    "max_tool_calls": 60
+  },
+  "loop_detection": {
+    "identical_call_limit": 2
+  },
+  "confidence_threshold": 0.6
+}
