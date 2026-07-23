@@ -14,6 +14,7 @@ spec:
     helm:
       valuesObject:
         loki:
+          isDefault: false
           resources:
             requests: { cpu: 50m, memory: 128Mi }
             limits: { memory: 256Mi }
