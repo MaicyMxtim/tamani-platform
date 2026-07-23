@@ -1,5 +1,5 @@
-# Two dashboards, loaded by Grafana's sidecar: one for service health,
-# one for AI spend. Split by audience per the plan.
+# Two dashboards, loaded by Grafana's sidecar. Generated JSON —
+# regenerate via the script in git history if editing.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,29 +8,285 @@ metadata:
   labels: { grafana_dashboard: "1" }
 data:
   tamani-service.json: |
-    {"title": "Tamani — Service Health", "uid": "tamani-svc", "timezone": "browser",
-     "time": {"from": "now-6h", "to": "now"}, "refresh": "30s", "schemaVersion": 39,
+    {
+     "title": "Tamani \u2014 Service Health",
+     "uid": "tamani-svc",
+     "timezone": "browser",
+     "editable": true,
+     "time": {
+      "from": "now-6h",
+      "to": "now"
+     },
+     "refresh": "30s",
+     "schemaVersion": 39,
+     "version": 1,
      "panels": [
-      {"type": "stat", "title": "Availability (5m)", "gridPos": {"x":0,"y":0,"w":6,"h":5},
-       "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 3,
-         "thresholds": {"steps": [{"color":"red","value":null},{"color":"yellow","value":0.99},{"color":"green","value":0.995}]}}},
-       "targets": [{"expr": "1 - tamani:api_error_ratio:rate5m"}]},
-      {"type": "stat", "title": "p95 latency", "gridPos": {"x":6,"y":0,"w":6,"h":5},
-       "fieldConfig": {"defaults": {"unit": "s", "decimals": 3,
-         "thresholds": {"steps": [{"color":"green","value":null},{"color":"red","value":0.4}]}}},
-       "targets": [{"expr": "tamani:api_p95_seconds:rate10m"}]},
-      {"type": "stat", "title": "Error budget left (30d, 99.5%)", "gridPos": {"x":12,"y":0,"w":6,"h":5},
-       "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 1,
-         "thresholds": {"steps": [{"color":"red","value":null},{"color":"yellow","value":0.2},{"color":"green","value":0.5}]}}},
-       "targets": [{"expr": "clamp_min(1 - (sum(increase(http_requests_total{namespace=\"tamani-prod\", status=~\"5..\"}[30d])) / clamp_min(sum(increase(http_requests_total{namespace=\"tamani-prod\"}[30d])) * 0.005, 1e-9)), 0)"}]},
-      {"type": "stat", "title": "Pod restarts (24h)", "gridPos": {"x":18,"y":0,"w":6,"h":5},
-       "targets": [{"expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"tamani-.*\"}[24h]))"}]},
-      {"type": "timeseries", "title": "Request rate by status", "gridPos": {"x":0,"y":5,"w":12,"h":8},
-       "targets": [{"expr": "sum by (status) (rate(http_requests_total{namespace=\"tamani-prod\"}[5m]))", "legendFormat": "{{status}}"}]},
-      {"type": "timeseries", "title": "Node memory working set", "gridPos": {"x":12,"y":5,"w":12,"h":8},
-       "fieldConfig": {"defaults": {"unit": "bytes"}},
-       "targets": [{"expr": "sum(container_memory_working_set_bytes{id=\"/\"})", "legendFormat": "used"}]}
-     ]}
+      {
+       "id": 1,
+       "type": "stat",
+       "title": "Availability (5m)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "1 - tamani:api_error_ratio:rate5m"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percentunit",
+         "decimals": 3,
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "color": "red",
+            "value": null
+           },
+           {
+            "color": "yellow",
+            "value": 0.99
+           },
+           {
+            "color": "green",
+            "value": 0.995
+           }
+          ]
+         }
+        },
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 2,
+       "type": "stat",
+       "title": "p95 latency",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "tamani:api_p95_seconds:rate10m"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "s",
+         "decimals": 3,
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "color": "green",
+            "value": null
+           },
+           {
+            "color": "red",
+            "value": 0.4
+           }
+          ]
+         }
+        },
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 3,
+       "type": "stat",
+       "title": "Error budget left (30d)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "clamp_min(1 - (sum(increase(http_requests_total{namespace=\"tamani-prod\", status=~\"5..\"}[30d])) / clamp_min(sum(increase(http_requests_total{namespace=\"tamani-prod\"}[30d])) * 0.005, 1e-9)), 0)"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percentunit",
+         "decimals": 1,
+         "thresholds": {
+          "mode": "absolute",
+          "steps": [
+           {
+            "color": "red",
+            "value": null
+           },
+           {
+            "color": "yellow",
+            "value": 0.2
+           },
+           {
+            "color": "green",
+            "value": 0.5
+           }
+          ]
+         }
+        },
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 4,
+       "type": "stat",
+       "title": "Pod restarts (24h)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=~\"tamani-.*\"}[24h]))"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 5,
+       "type": "timeseries",
+       "title": "Request rate by status",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum by (status) (rate(http_requests_total{namespace=\"tamani-prod\"}[5m]))",
+         "legendFormat": "{{status}}"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "reqps"
+        },
+        "overrides": []
+       }
+      },
+      {
+       "id": 6,
+       "type": "timeseries",
+       "title": "Node memory working set",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(container_memory_working_set_bytes{id=\"/\"})",
+         "legendFormat": "used"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "bytes"
+        },
+        "overrides": []
+       }
+      }
+     ]
+    }
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -40,23 +296,233 @@ metadata:
   labels: { grafana_dashboard: "1" }
 data:
   tamani-spend.json: |
-    {"title": "Tamani — AI Spend", "uid": "tamani-spend", "timezone": "browser",
-     "time": {"from": "now-24h", "to": "now"}, "refresh": "1m", "schemaVersion": 39,
+    {
+     "title": "Tamani \u2014 AI Spend",
+     "uid": "tamani-spend",
+     "timezone": "browser",
+     "editable": true,
+     "time": {
+      "from": "now-24h",
+      "to": "now"
+     },
+     "refresh": "1m",
+     "schemaVersion": 39,
+     "version": 1,
      "panels": [
-      {"type": "stat", "title": "Spend (24h)", "gridPos": {"x":0,"y":0,"w":6,"h":5},
-       "fieldConfig": {"defaults": {"unit": "currencyUSD", "decimals": 4}},
-       "targets": [{"expr": "sum(increase(gateway_spend_usd_total[24h]))"}]},
-      {"type": "stat", "title": "Saved by cache (24h)", "gridPos": {"x":6,"y":0,"w":6,"h":5},
-       "fieldConfig": {"defaults": {"unit": "currencyUSD", "decimals": 4}},
-       "targets": [{"expr": "sum(increase(gateway_saved_usd_total[24h]))"}]},
-      {"type": "stat", "title": "Cache hit rate (24h)", "gridPos": {"x":12,"y":0,"w":6,"h":5},
-       "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 1}},
-       "targets": [{"expr": "sum(increase(gateway_cache_hits_total[24h])) / clamp_min(sum(increase(gateway_cache_hits_total[24h])) + sum(increase(gateway_cache_misses_total[24h])), 1)"}]},
-      {"type": "stat", "title": "Tokens (24h)", "gridPos": {"x":18,"y":0,"w":6,"h":5},
-       "targets": [{"expr": "sum(increase(gateway_tokens_total[24h]))"}]},
-      {"type": "timeseries", "title": "Spend by purpose ($/h)", "gridPos": {"x":0,"y":5,"w":12,"h":8},
-       "fieldConfig": {"defaults": {"unit": "currencyUSD"}},
-       "targets": [{"expr": "sum by (purpose) (increase(gateway_spend_usd_total[1h]))", "legendFormat": "{{purpose}}"}]},
-      {"type": "timeseries", "title": "Tokens by purpose", "gridPos": {"x":12,"y":5,"w":12,"h":8},
-       "targets": [{"expr": "sum by (purpose, direction) (increase(gateway_tokens_total[1h]))", "legendFormat": "{{purpose}} {{direction}}"}]}
-     ]}
+      {
+       "id": 1,
+       "type": "stat",
+       "title": "Spend (24h)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(increase(gateway_spend_usd_total[24h]))"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "currencyUSD",
+         "decimals": 4
+        },
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 2,
+       "type": "stat",
+       "title": "Saved by cache (24h)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(increase(gateway_saved_usd_total[24h]))"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "currencyUSD",
+         "decimals": 4
+        },
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 3,
+       "type": "stat",
+       "title": "Cache hit rate (24h)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(increase(gateway_cache_hits_total[24h])) / clamp_min(sum(increase(gateway_cache_hits_total[24h])) + sum(increase(gateway_cache_misses_total[24h])), 1)"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "percentunit",
+         "decimals": 1
+        },
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 4,
+       "type": "stat",
+       "title": "Tokens (24h)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 5
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum(increase(gateway_tokens_total[24h]))"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+       },
+       "options": {
+        "reduceOptions": {
+         "calcs": [
+          "lastNotNull"
+         ]
+        }
+       }
+      },
+      {
+       "id": 5,
+       "type": "timeseries",
+       "title": "Spend by purpose ($/h)",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 12,
+        "h": 8
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum by (purpose) (increase(gateway_spend_usd_total[1h]))",
+         "legendFormat": "{{purpose}}"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {
+         "unit": "currencyUSD"
+        },
+        "overrides": []
+       }
+      },
+      {
+       "id": 6,
+       "type": "timeseries",
+       "title": "Tokens by purpose",
+       "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+       },
+       "gridPos": {
+        "x": 12,
+        "y": 5,
+        "w": 12,
+        "h": 8
+       },
+       "targets": [
+        {
+         "refId": "A",
+         "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+         },
+         "expr": "sum by (purpose, direction) (increase(gateway_tokens_total[1h]))",
+         "legendFormat": "{{purpose}} {{direction}}"
+        }
+       ],
+       "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+       }
+      }
+     ]
+    }
