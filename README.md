@@ -22,7 +22,9 @@ All twelve phases complete; every headline number is measured, not claimed.
 | 10. Developer self-service | done | `tamani new` → serving in 195s, measured |
 | 11. Cost & unit economics | done | tiering experiment, crossover, $/1k published |
 
-Key evidence documents: `docs/unit-economics.md`, `runbooks/postmortems/`,
+Start here: **`docs/walkthrough.md`** (a tour of the platform) and
+**`docs/study-reference.md`** (the concepts, subject by subject).
+Evidence: `docs/unit-economics.md`, `runbooks/postmortems/`,
 `runbooks/chaos/`, `runbooks/golden-path.md`, `docs/adr/`.
 
 ## Repository layout
