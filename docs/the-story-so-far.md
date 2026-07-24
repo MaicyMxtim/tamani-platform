@@ -1,296 +1,629 @@
-# The Tamani Platform — what we've built so far
+# Platform Engineering — a study reference
 
-This is a plain walkthrough of everything done on the project between 22 and 23 July 2026. It is written for someone new to this field. Technical words are shown in **bold** and explained the first time they appear.
-
----
-
-## 1. What we are building and why
-
-You already have a venue discovery app. It has a database of 1,275 real restaurants, cafés and bars in Brighton. Each venue is tagged with "vibes" such as *late-night* or *work-friendly*.
-
-This project takes that data and builds professional **infrastructure** around it. Infrastructure means all the systems that keep software running reliably: the servers, the deployment process, the security, the monitoring.
-
-The app itself is not the point. The infrastructure is the point. Platform engineering, DevOps, cloud and SRE jobs are all about this kind of work, and this project gives you real evidence that you can do it. When it is finished, the GitHub repository will show working examples of the skills those jobs ask for.
-
-Three basic words before we start:
-
-- A **server** is a computer that runs your software and answers requests from other computers. It can be your laptop or a rented machine in a data centre.
-- An **API** is a program that answers structured questions over the internet. When an app asks "give me all the late-night venues", the API is the program that answers.
-- **Production** (or "prod") is the live environment that real users touch. **Development** ("dev") is your private practice area. Breaking dev is normal. Breaking production is a problem.
+A subject-by-subject reference for the concepts used to build the Tamani Platform. Each chapter defines a concept, explains why it is used, lists its key terminology, describes how it works, gives best practices, and records how it was implemented in this project.
 
 ---
 
-## 2. The three programs we wrote
+# 1. APIs
 
-The whole system is built around three small Python programs.
+An API (Application Programming Interface) is a defined way for one piece of software to request data or actions from another over a network. A web API receives structured requests over HTTP and returns structured responses, usually as JSON.
 
-**The API** serves the venue data. It handles search, filtering, and a feed. It is built with **FastAPI**, a popular Python tool for writing APIs.
+## Purpose
 
-**The inference gateway** will be the only program allowed to talk to an AI model. Every AI request in the system has to go through this one door. That is how you control spending, cache repeated answers, and keep API keys in one place. **Inference** simply means asking a trained AI model a question. Right now the gateway uses a fake classifier that costs nothing. We will connect a real AI model in Phase 5.
+An API separates a service's capabilities from the clients that use them. A mobile app, a website and another backend can all call the same API without sharing code, and the service can change internally as long as the API contract stays stable.
 
-**The worker** does background jobs. When a job like "classify venue X" appears on a queue, the worker picks it up, calls the gateway, and saves the result. Workers exist so that slow tasks never block the API. The API answers users straight away, and the heavy work happens in the background.
+## Terminology
 
----
+- **Endpoint** — a single URL path that performs one operation, such as `/venues`.
+- **HTTP method** — the verb describing intent: `GET` reads, `POST` creates, `PUT`/`PATCH` update, `DELETE` removes.
+- **Status code** — a number describing the outcome: `2xx` success, `4xx` client error, `5xx` server error.
+- **JSON** — the standard text format for request and response bodies.
+- **Contract** — the agreed set of endpoints, inputs and outputs a client can rely on.
 
-## 3. Phases 0 and 1: containers
+## Mechanics
 
-### The problem containers solve
+A client sends an HTTP request to an endpoint. The server processes it, performs any work, and returns a status code and a response body. The exchange is stateless: each request carries everything the server needs, and the server keeps no memory of previous requests unless it stores state elsewhere.
 
-There is an old joke in software: "it works on my machine". Code often behaves differently on a server than on your laptop, because the two machines have different versions of Python, different libraries, and different settings.
+## Best practices
 
-A **container** solves this. It packages a program together with everything it needs: the right Python version, the right libraries, the right system files. The result runs the same way on any computer. **Docker** is the standard tool for building and running containers.
+- Give endpoints clear, resource-oriented names.
+- Use the correct HTTP method and status code for each operation.
+- Validate all input at the boundary.
+- Version the API so changes do not break existing clients.
+- Return errors that state what went wrong.
 
-Two related words: an **image** is the frozen, shippable version of a container, like a recipe that has been prepared and boxed. A container is an image that is actually running. A **Dockerfile** is the text file that describes how to build the image.
+## In the Tamani Platform
 
-We used a technique called a **multi-stage build**. The tools needed to build the program are used in a temporary stage and then thrown away, so the final image only contains what is needed to run. Smaller images download faster, and they give attackers less to work with.
-
-### Security hardening
-
-We made the containers deliberately restrictive:
-
-- **Non-root.** Inside each container, our program runs as a low-privilege user instead of the all-powerful "root" account. If an attacker gets in, they land in a locked room rather than the control tower.
-- **Read-only filesystem.** The running program cannot change its own files.
-- **Health probes.** These are small web addresses that the platform checks to ask "are you OK?". There are three kinds, and they answer different questions. The **liveness** probe asks "is the process responding at all?" If not, restart it. The **readiness** probe asks "are you ready for traffic right now?" It checks things like whether the database is reachable. If not, hold traffic back, but do not restart. The **startup** probe asks "are you still booting?" Mixing these up is a classic mistake. If your database goes down and your liveness probe checks the database, Kubernetes will restart your app over and over, which fixes nothing.
-- **Structured logging.** Every log line is written as JSON so machines can search it. Every request also gets a random **correlation ID** that follows it from service to service. When something breaks, you can search for that one ID and see the whole journey of a single request.
-
-### Running everything locally
-
-**Docker Compose** starts many containers together from one configuration file. One command brings up our three programs plus the supporting services:
-
-- **Postgres** is a database. It is the long-term memory of the system.
-- **Redis** is a very fast, temporary data store. We use it for caching and counters. If Postgres is a filing cabinet, Redis is the sticky notes on your desk.
-- **NATS** is a message queue. Phase 4 covers it properly.
-- **Prometheus** collects **metrics**, which are numbers tracked over time, like requests per second or memory used. It visits each service every 15 seconds and records what it finds.
-- **Grafana** turns those numbers into dashboards and charts.
-
-We also wrote a **Makefile**, which is a list of command shortcuts. `make up` starts everything. `make test` runs the tests. `make smoke` checks that every service answers. This means nobody has to memorise long commands.
-
-### Version control and the data
-
-Everything lives in **Git**, the standard tool for tracking changes to code. It records every change, who made it, and why. Our project is a **monorepo**, which means one repository holds everything: the apps, the infrastructure files, and the documentation. It is published on GitHub as `MaicyMxtim/tamani-platform`.
-
-You asked not to use the original app's live machinery, because it calls paid services. So we took a **static snapshot** instead: the 1,275 venues were exported once into a file, and that file is baked into the API's image. Real data, no ongoing costs. Of those venues, 1,231 already have vibe tags and 44 do not. Those 44 will be the first real job for the AI enrichment agent later.
+The venue API is written with FastAPI, a Python framework for building web APIs. It exposes read endpoints for venue search, a public feed, and health checks. Data is served from a bundled snapshot of 1,275 venues, or from a database when one is configured.
 
 ---
 
-## 4. Phase 2: Kubernetes
+# 2. Docker
 
-### What Kubernetes is
+A container packages an application together with everything it needs to run: the runtime, libraries and system dependencies. This ensures the application behaves the same on a developer's machine, a test environment and production. Docker is the standard platform for building and running containers.
 
-Docker runs one container. **Kubernetes** runs many containers across one or more machines, and keeps them running. You give it a written description of what you want, for example "run two copies of the API, give each this much memory, restart them if they crash". Kubernetes then works constantly to make reality match that description.
+## Purpose
 
-This style is called **declarative**. You declare the destination, and the system works out the driving directions.
+Without containers, software often behaves differently across machines because of differing versions of runtimes, libraries and configuration. Containers eliminate this by shipping a fixed environment alongside the code.
 
-The main vocabulary:
+## Terminology
 
-- A **cluster** is a group of machines that Kubernetes manages as one unit.
-- A **node** is one machine in the cluster.
-- A **pod** is the smallest unit Kubernetes runs. It is usually one container.
-- A **deployment** tells Kubernetes "keep this many copies of this pod running", and manages upgrades.
-- A **service** gives pods a stable internal name, like `tamani-api`. Pods come and go, but the name always works.
-- A **namespace** is a partition inside a cluster. We made three: dev, staging and prod, so the environments cannot interfere with each other.
-- **kubectl** is the command-line tool for giving instructions to a cluster.
+- **Image** — a read-only package containing an application and all of its dependencies.
+- **Container** — a running instance of an image.
+- **Dockerfile** — a text file containing the instructions used to build an image.
+- **Layer** — a cached step in an image build; reused when unchanged to speed rebuilds.
+- **Registry** — a store for images, such as GitHub Container Registry.
 
-We run two clusters. **minikube** is a practice cluster that lives entirely on your Mac. **k3s** is a lightweight but real Kubernetes that runs on our rented cloud machine.
+## Mechanics
 
-### The guardrails
+A Dockerfile lists build steps. Building it produces an image. Running the image produces a container, isolated from the host and other containers but sharing the host kernel. Images are pushed to a registry and pulled wherever they are needed.
 
-Anyone can install Kubernetes. The rarer skill, and the one this phase demonstrates, is making one cluster safe for several teams and environments to share. We built:
+## Best practices
 
-- **RBAC**, which stands for role-based access control. It defines who may do what. We created a "developer" role that can read pods and logs but cannot delete anything, and a "deployer" role that can update workloads and nothing else. We tested this by asking the cluster directly, and it refused the forbidden actions.
-- **Resource quotas.** Each namespace has a cap on how much CPU, memory and how many pods it can use. Without caps, one runaway service can starve everything else on the cluster.
-- **Network policies.** These are firewalls between pods. We started with "deny everything", and then opened only the specific connections the design needs. For example, the worker may talk to the gateway, but the API may not. We proved this live: a blocked connection failed, an allowed one worked. One well-known trap: "deny everything" also blocks **DNS**, the phonebook service that turns names into network addresses. You have to re-allow DNS explicitly or nothing in the namespace can find anything.
-- **Pod Security.** The cluster refuses any pod that asks for dangerous privileges, such as running as root.
-- **Kyverno**, an **admission controller**. This is a doorman that inspects everything entering the cluster and rejects anything that breaks the rules, before it runs. Our rules: no `latest` image tags, every container must declare memory and CPU limits, and every deployment must be labelled. We tested it by trying to run a rule-breaking pod, and the cluster refused it with a written explanation.
+- Use multi-stage builds so build tools are discarded from the final image.
+- Run as a non-root user.
+- Keep images small by choosing slim base images.
+- Use a read-only root filesystem where possible.
+- Include health check endpoints.
+- Pin exact image versions rather than mutable tags such as `latest`.
 
-Why is the `latest` tag banned? Image tags are like stickers, and `latest` gets moved to each new image as it is built. A pod that says "run latest" might run different code every time it restarts, and you can never be sure what is actually deployed. Pinning an exact version removes the guesswork.
+## In the Tamani Platform
 
----
-
-## 5. Renting a real computer: AWS and Terraform
-
-### What we rented
-
-"The cloud" means renting computers in someone else's data centre. **AWS** (Amazon Web Services) is the largest provider. We set up:
-
-- An **EC2 instance**, which is one virtual machine. Ours is a small one (2 CPUs, 2 GB of memory) in the London region. It runs our k3s cluster.
-- An **Elastic IP**, which is a permanent public address for the machine.
-- **Route53**, which is AWS's **DNS** service. DNS is the internet's phonebook. It translates `platform.waypear.com` into the machine's numeric address. You updated your domain registrar to hand DNS control to AWS. That is what the four "awsdns" nameserver entries were for.
-- An **S3 bucket**, which is cheap file storage. Ours holds backups, and automatically deletes anything older than 30 days.
-- A **security group**, which is AWS's firewall around the machine. Web traffic is open to everyone. Remote login and cluster control are only allowed from your home IP address.
-
-**SSH** is the standard way to log into a remote machine. It uses a **key pair**: two mathematically linked files. The public half sits on the server. The private half stays on your Mac and proves you are you. There is no password to steal.
-
-### Infrastructure as code
-
-We did not click any of this together in the AWS website. We described it all in **Terraform**, a language for defining cloud infrastructure in text files, and then ran one command to make AWS match the description.
-
-This approach is called **infrastructure as code**, and it matters for three reasons. The files live in Git, so infrastructure changes have history and can be reviewed. The whole setup can be rebuilt from scratch. And you can detect **drift**, which is when the real world quietly stops matching the written description. We checked for drift after building, and the answer was "no changes", which is exactly what you want.
-
-Two small notes. We actually use **OpenTofu**, a free open-source version of Terraform, because the original changed its licence. They work identically. And to answer your question from that evening: the tool is free. What costs money are the AWS resources it creates. Your new-account free credits are currently covering the machine, and DNS costs about 50p a month.
+Each service has a multi-stage Dockerfile that installs dependencies in a builder stage and copies only the result into a slim final image. Containers run as a non-root user with a read-only root filesystem and dropped Linux capabilities. Final images are kept under 200 MB.
 
 ---
 
-## 6. Phase 3: GitOps
+# 3. Docker Compose
 
-### The idea
+Docker Compose runs multiple containers together as a single application, defined in one configuration file.
 
-The traditional way to deploy software is for a person to log into a server and run commands. It works until someone forgets a step, or nobody remembers what was done six months ago.
+## Purpose
 
-**GitOps** flips this around. The Git repository becomes the single source of truth for what should be running. Software inside the cluster reads the repository and makes reality match it. To change production, you change a file, commit it, and push. Every deployment in history is visible in the Git log.
+Real systems consist of several services (an application, a database, a cache, a message broker). Compose starts them together with one command, giving a reproducible local environment.
 
-Two automated systems make this work.
+## Terminology
 
-**GitHub Actions** provides **CI**, which stands for continuous integration. Every time code is pushed, a robot runs the tests. If they pass, it builds the three container images and uploads them to **GHCR**, GitHub's image storage. This is the "registry" we dealt with when the cluster could not download the images. The images were stored privately, and the cluster had no credentials, so you made them public.
+- **Service** — one container definition within a Compose file.
+- **compose.yml** — the file describing services, their images, ports and dependencies.
+- **Volume** — persistent storage that outlives a container.
+- **Depends-on** — an ordering hint between services.
 
-**Argo CD** runs inside the cluster. It constantly compares what Git says should exist with what actually exists, and fixes any difference. It reads our repository using a **deploy key**, which is a key that grants read-only access to that one repository and nothing else.
+## Mechanics
 
-### One file bootstraps everything
+The Compose file declares each service, its build source or image, environment variables, ports and volumes. One command builds and starts the whole set on a shared network where services reach each other by name.
 
-We used a pattern called **app of apps**. I applied exactly one file to the cluster by hand: a "root" application. That root defines all the other applications, and Argo creates and manages them itself. Everything since then has entered the cluster through Git only.
+## Best practices
 
-Different environments get different trust levels. Platform configuration syncs automatically. Production workloads sit behind a **manual gate**: a human has to consciously approve each release. Promoting to production is a deliberate act, which is exactly what the project plan asks for.
+- Keep the Compose file as the single description of the local stack.
+- Use named volumes for data that must persist.
+- Mirror production configuration where practical.
+- Expose only the ports needed for local work.
 
-Production also pins its images by **commit SHA**. A SHA is the unique fingerprint of one exact Git commit. Pinning by SHA means you can always answer the question "exactly what code is running in production right now?"
+## In the Tamani Platform
 
-### The front door
-
-To let the public reach the cluster safely, we added:
-
-- **ingress-nginx**, the cluster's front door. An **ingress** is a routing rule, such as "requests for platform.waypear.com go to the API service". Ours also limits each visitor to 20 requests per second as a basic defence.
-- **cert-manager** with **Let's Encrypt**. **TLS** is the encryption behind the padlock in your browser, the S in HTTPS. Certificates prove a website is who it claims to be. Let's Encrypt issues them for free, and cert-manager is the robot that requests and renews them automatically. Our certificate was issued 44 seconds after we asked, because your DNS change had already taken effect.
-
-The result is live right now. **https://platform.waypear.com** serves your venues to the whole internet, encrypted, from your own cluster, deployed entirely from Git. The page at `/docs` is an interactive explorer where you can try the API in your browser.
-
----
-
-## 7. Phase 4: the message queue, done properly
-
-### Why queues exist
-
-Some work does not need an instant answer. "Reclassify all 1,300 venues" is a good example. You do not do that kind of work inside an API request. Instead you put messages on a **queue**, and workers process them at their own pace. The API stays fast. If a worker dies, the messages simply wait.
-
-Our message system is **NATS JetStream**. Its concepts:
-
-- A **stream** is a durable log of messages, saved to disk, which survives restarts.
-- A **subject** is a message's address. Ours are hierarchical, like `venue.enrichment.requested` and `venue.enrichment.completed`, so a program can subscribe to exactly the kind it cares about.
-- A **consumer** is a reader's bookmark in the stream. Our workers share one bookmark as a group, so each message is handled by exactly one worker, even when there are many workers.
-
-We also wrote an **ADR**, an architecture decision record. It is a short document explaining why we chose NATS instead of the two obvious alternatives, Kafka and Redis Streams. Kafka is the industry standard but is far too heavy for our small machine. Redis Streams was already installed but gives weaker guarantees. ADRs prove that decisions were made with reasons, not by default.
-
-### Handling failure
-
-The hard part of messaging is what happens when things fail. Here is what we built, and every one of these was demonstrated with a real test, not just written down:
-
-**Messages can arrive twice.** Our system guarantees each message is delivered at least once, which sometimes means more than once. So every worker is **idempotent**, which means doing the same job twice causes no harm. Each message carries an ID, and the worker checks "have I already finished this one?" before working.
-
-We found a real bug here. My first version marked a job as done *before* doing the work. That looks harmless, but think about a worker that crashes in the middle of a job. The "done" marker is already written, so when the message is redelivered, the next worker skips it. The work is silently lost. The fix is to check at the start but only write the marker after the job succeeds.
-
-**Workers only confirm after finishing.** A worker tells the queue "delete this message" only when the work is complete. We proved the value of this by force-killing a worker 12 seconds into a job. The message was automatically given to a healthy worker, which finished it. Nothing was lost.
-
-**Failed messages retry with growing delays.** A failing message is retried after 1 second, then 2, then 4, then 8. This spacing is called **exponential backoff**, and it stops a struggling service from being hammered by instant retries. We watched these exact delays appear in the logs.
-
-**Hopeless messages go to a dead letter queue.** After 5 failed attempts, a message is moved to a separate **DLQ** subject where a human can inspect it. Without this, a broken message would retry forever.
-
-**Garbage goes to quarantine.** A message that is not even valid data would crash every worker that touched it, over and over, and take down the whole pool. This is called a **poison message**. Our worker detects it immediately and parks it in a quarantine subject without retrying. We tested this by feeding the system deliberate garbage, and the workers carried on unharmed.
-
-**History can be replayed.** Because the stream keeps its history, a small script can re-send all messages from any point in time. This is how you redo work after improving the classifier.
-
-**The backlog is measured.** The number of waiting messages is called **consumer lag**, and we publish it as a metric. Later it becomes the signal for **autoscaling**: when the backlog grows, add workers; when it empties, remove them.
+A Compose file runs the API, the inference gateway, a worker, Redis, NATS, Postgres, Prometheus and Grafana together for local development. A Makefile wraps common operations (`up`, `down`, `test`, `smoke`) as single commands.
 
 ---
 
-## 8. The night we broke production
+# 4. Kubernetes
 
-During the Phase 4 release, the website went down for about ten minutes. This was our first real **incident**, and honestly, it is one of the most valuable things in the project so far. The plan itself says that most job candidates have never diagnosed a system they own, because they have never broken one.
+Kubernetes is a system that runs and manages containers across one or more machines. It is given a declarative description of the desired state and continuously works to make the actual state match it.
 
-Here is what happened, step by step.
+## Purpose
 
-Our cloud machine has 2 GB of memory, and normal usage was already close to the limit. When Kubernetes upgrades an application, it briefly runs the old and new copies side by side. On top of that, the machine was unpacking three freshly downloaded images. Together this pushed memory demand past what the machine had.
+Running containers by hand does not scale: containers must be restarted on failure, replaced on new versions, spread across machines and connected to each other. Kubernetes automates this.
 
-The machine also had no **swap**. Swap is space on disk that acts as slow overflow memory. Without it, the machine entered a state called **thrashing**: it spent all its effort shuffling memory around and had nothing left for real work. The clue that told us this: SSH would accept a connection, but could not actually run any command. The machine was not dead. It was overwhelmed.
+## Terminology
 
-The fix, in order: we rebooted the machine through AWS, which was safe because everything on it can be rebuilt from Git. We added 2 GB of swap so this failure mode cannot lock the machine again. And we changed the upgrade strategy so new pods replace old ones one at a time instead of doubling up. The trade-off is a few seconds of downtime per service during each release, which is acceptable for now.
+- **Cluster** — a set of machines managed together by Kubernetes.
+- **Node** — one machine in the cluster.
+- **Pod** — the smallest deployable unit, usually one container.
+- **Deployment** — a controller that keeps a specified number of identical pods running and manages rollouts.
+- **Service** — a stable internal name and address for a set of pods.
+- **Namespace** — a partition within a cluster used to separate environments or teams.
+- **kubectl** — the command-line tool for interacting with a cluster.
+- **Manifest** — a YAML file declaring a desired resource.
 
-There were two deeper lessons.
+## Mechanics
 
-First, a green status light is not proof. During the chaos, Argo reported the release as "Healthy" and "Synced" while it had actually applied old files from its cache. We only caught this by checking which image was truly running, and it was the old one. The lesson: verify the thing itself, not the dashboard about the thing.
+Desired state is submitted as manifests. Controllers compare desired state against actual state and take corrective action: creating pods, replacing failed ones, and rolling out new versions gradually. Scheduling places pods onto nodes based on available resources and constraints.
 
-Second, every fix went back into code. The swap setup is now part of the machine's build script, so a replacement machine gets it automatically. The upgrade strategy fix is in the deployment configuration. And the whole event is written up as a **postmortem**, the industry's standard incident report. Postmortems are "blameless": they ask why the system allowed the failure, not whose fault it was. Ours lives in the repository under `runbooks/postmortems/`.
+## Best practices
 
----
+- Set resource requests and limits on every container.
+- Separate environments with namespaces.
+- Use liveness, readiness and startup probes that test distinct conditions.
+- Apply Pod Security standards to block privileged workloads.
+- Use PodDisruptionBudgets to preserve availability during disruptions.
 
-## 9. Phase 5: the gateway becomes real
+## In the Tamani Platform
 
-This phase connected a real AI model. You created an API key at Anthropic and stored it in two places: a local file that Git ignores, and a Kubernetes **secret**, which is the cluster's built-in store for sensitive values. Secrets never go into Git.
-
-The gateway now works like this. A request comes in. First it checks the tenant's **token budget**, which is a spending allowance per minute and per day. A tenant that runs out gets told to retry later instead of running up a bill. Then it checks the **semantic cache**. The venue description is turned into an **embedding**, which is a list of numbers that captures the meaning of the text. If a previous request was similar enough, the stored answer is returned for free. Only if there is no match does the gateway call Claude, and the response comes back in a guaranteed valid format because we use the API's structured output feature.
-
-We tuned the cache threshold with real data instead of guessing. Across 400 real venues, a threshold of 0.94 produced zero wrong cache answers in our sample. A looser threshold would save more money but sometimes serve a cached answer that did not really fit. We chose accuracy.
-
-Real numbers from the first live runs: one classification costs about $0.004, so a thousand cost about $3.92. We classified all 44 venues that had no tags for a total of $0.18. The model marked 43 of them as low confidence, which is honest: those venues only have a name and a type to go on. In Phase 6 those low-confidence answers will go to a human review queue instead of being written to the database as truth.
-
-Deploying to production found three real problems, which is normal and useful. First, our locked-down containers have read-only filesystems, and the embedding library needed one small scratch folder, so we gave it exactly that and nothing more. Second, our firewall rules blocked the gateway from reaching Anthropic at all, because in Phase 2 we had denied everything by default. We opened one specific path: the gateway, and only the gateway, may make outbound encrypted calls. Third, and most interesting: while the key was misconfigured, the gateway correctly fell back to its free mock classifier, but those mock answers were being saved into the cache and kept being served after the real provider came back. The fix is a rule that fallback answers are never cached. Finding that bug before it mattered is exactly what this project is for.
-
-We also upgraded the cloud machine from 2 GB to 4 GB of memory, since the incident in Phase 4 proved the small one was full. It costs about $34 a month, covered by your AWS credits for now.
-
-## 10. Phases 6 to 11: the rest of the build
-
-**Phase 6, governed agents.** This is the flagship. We built two AI agents that act on their own, made safe by a set of controls. Each agent has a **capability manifest**: a list of the only tools it is allowed to use, and anything outside that list is refused. Each has spending caps, a time limit, and a limit on how many actions it can take before it must stop. It has **loop detection**, which halts an agent that keeps repeating the same action. It has a **dry-run mode** that simulates every action without actually doing it. We proved all of these by trying to break the rules and watching the system refuse.
-
-The first agent classifies venues and sends any low-confidence answer to a human review queue instead of saving it. The second is an operations agent. You labelled a **golden set** for us, a couple of hundred venues judged by a human, and that became the yardstick every AI change is measured against. The operations agent reads a production alert, investigates the cluster using read-only access it cannot exceed, works out the cause, and **opens a pull request with its diagnosis**. It never changes anything itself. We proved it live: we deliberately broke a pod, and the agent opened a correct pull request diagnosing exactly what was wrong.
-
-**Phase 7, observability.** We deployed the monitoring stack: Prometheus for metrics, Grafana for dashboards, Loki for logs. We defined **SLOs**, which are formal reliability targets, such as "99.5% of requests succeed" and "95% of requests are faster than 400 milliseconds". We added **burn-rate alerts**: a fast problem pages immediately, a slow problem raises a ticket, which cuts out most alert noise. You saw the live dashboards showing 100% availability and 95-millisecond response times.
-
-**Phase 8, supply chain security.** Every image is now **signed** during the build using a signature tied to this repository, not a password that could leak. The cluster refuses any image that is not signed, which we proved by trying to run an unsigned one and getting rejected. Every build is also scanned for known vulnerabilities and ships an ingredient list called an **SBOM**. The API key moved out of the cluster into AWS's secret store, from where it syncs in automatically.
-
-**Phase 9, reliability proof.** We ran load tests and deliberate failure experiments, each with a written prediction beforehand. Killing an API copy under live traffic caused zero errors. Killing the single AI gateway caused a 20-second gap that recovered on its own. We also found the platform's breaking point: around 25 to 30 simultaneous users, the small shared machine runs out of memory. Rather than hide that, we documented it honestly, which is exactly the kind of evidence the plan says employers look for. The project now has three real incident write-ups.
-
-**Phase 10, developer self-service.** This is what makes it a true internal developer platform. One command, `tamani new`, creates a complete new service with everything already wired in: hardened container, health checks, monitoring, security policy, a signed build pipeline, and a runbook. We measured it end to end: **195 seconds from the command to the new service answering live traffic**, with no manual cluster work. A developer here cannot ship a service without proper operability, because the template supplies it all.
-
-**Phase 11, cost and unit economics.** We put a real money figure on everything. A thousand classifications cost about $4 on the best model. We ran an experiment comparing three models of different price and quality against your golden set, and found that using a cheaper model for easy cases and the expensive one only for hard cases would cut cost by about 57% for a small, measured drop in accuracy. We also worked out that self-hosting the AI would only pay off at hundreds of thousands of classifications a month, far above what this app needs, so the managed service is the right call. All of it is written up in `docs/unit-economics.md`.
-
-## 11. The build is complete
-
-All twelve phases are done. You have a live, public, encrypted website running on your own Kubernetes cluster on AWS, deployed entirely through Git, with a governed AI system, full monitoring, an enforced secure supply chain, three genuine incident write-ups, a one-command service generator, and published cost figures. Total spend: your free AWS credits, a few dollars of AI usage, and about 50p a month for DNS.
-
-The repository tells a story most portfolios cannot: real production, a real outage handled and learned from, real reliability targets, real AI agents kept safe, and real money figures. That is the whole point of the project.
+The platform runs on minikube locally and on k3s on a single cloud node. Three namespaces separate development, staging and production. Workloads declare resource requests and limits, three distinct health probes, and restricted Pod Security. A PodDisruptionBudget keeps at least one API replica available during voluntary disruptions.
 
 ---
 
-## 11. Quick reference
+# 5. Networking
 
-| Term | Meaning |
-|---|---|
-| API | A program that answers structured requests over the internet |
-| Container | A program packaged with everything it needs, so it runs the same everywhere |
-| Image | The frozen, shippable form of a container |
-| Docker | The standard tool for building and running containers |
-| Kubernetes | Software that keeps many containers running to match a written description |
-| Pod | The smallest unit Kubernetes runs, usually one container |
-| Deployment | An instruction to keep a number of pod copies running |
-| Namespace | A partition inside a cluster, like dev, staging and prod |
-| RBAC | Rules for who may do what in the cluster |
-| Network policy | A firewall between pods |
-| Kyverno | A doorman that rejects rule-breaking workloads before they run |
-| Terraform | A language for defining cloud infrastructure in text files |
-| Drift | When reality stops matching the written definition |
-| DNS | The internet's phonebook, turning names into addresses |
-| TLS | The encryption behind the browser padlock |
-| CI | A robot that tests and builds your code on every push |
-| Registry | Storage for built container images |
-| GitOps | Git is the source of truth, and software syncs the cluster to it |
-| Argo CD | The tool that does GitOps in our cluster |
-| Ingress | Rules for routing outside traffic into the cluster |
-| Queue | A place where jobs wait until a worker picks them up |
-| Idempotent | Safe to run twice |
-| Exponential backoff | Growing delays between retries |
-| Dead letter queue | A parking area for messages that keep failing |
-| Poison message | A broken message that would crash workers forever |
-| Consumer lag | The size of the message backlog |
-| Swap | Disk space used as slow overflow memory |
-| Thrashing | A machine so short of memory it can do no useful work |
-| Postmortem | A blameless report on an incident and its lessons |
-| ADR | A short record of why a technical decision was made |
+Networking in Kubernetes governs how pods communicate with each other, with services inside the cluster, and with the outside world.
 
-*This document lives in the repository at `docs/the-story-so-far.md` and will grow with the project.*
+## Purpose
+
+By default every pod can reach every other pod. Controlling this traffic limits the blast radius of a compromise and enforces that services only talk to their declared dependencies. Ingress controls how external traffic reaches the cluster.
+
+## Terminology
+
+- **NetworkPolicy** — a rule set defining which pods may send or receive traffic.
+- **Default deny** — a baseline policy that blocks all traffic until specific paths are allowed.
+- **DNS** — the service that resolves names (such as `redis`) to addresses; provided in-cluster by CoreDNS.
+- **Ingress** — a rule mapping external hostnames and paths to internal services.
+- **Ingress controller** — the component that implements ingress rules, such as ingress-nginx.
+- **TLS** — encryption for traffic in transit, providing the padlock in HTTPS.
+
+## Mechanics
+
+NetworkPolicies select pods by label and permit named ingress and egress paths; anything not permitted is dropped. External traffic reaches an ingress controller, which terminates TLS and routes requests to the correct service based on hostname and path. Certificates for TLS are issued and renewed automatically by a certificate manager.
+
+## Best practices
+
+- Start from default-deny and open only required paths.
+- Explicitly allow DNS egress, since default-deny blocks it and breaks all name resolution.
+- Terminate TLS at the edge and redirect HTTP to HTTPS.
+- Rate-limit at the edge as a first line of defence.
+- Restrict which single workload may make outbound calls to external providers.
+
+## In the Tamani Platform
+
+A default-deny NetworkPolicy blocks all pod traffic; explicit policies open only the required paths, with DNS egress allowed separately. ingress-nginx terminates TLS for `platform.waypear.com`, using certificates issued automatically by cert-manager from Let's Encrypt. Only the inference gateway is permitted outbound HTTPS to the model provider.
+
+---
+
+# 6. Storage
+
+Storage covers how applications hold data, both transient (in memory or a cache) and durable (surviving restarts).
+
+## Purpose
+
+Containers are ephemeral: their local filesystem is lost when they stop. Data that must persist, or must be shared between replicas, requires storage that lives independently of any single container.
+
+## Terminology
+
+- **Volume** — storage attached to a pod.
+- **PersistentVolumeClaim** — a request for durable storage of a given size.
+- **emptyDir** — a temporary volume that exists only for a pod's lifetime.
+- **Cache** — fast, often in-memory storage for data that can be recomputed.
+- **Object store** — remote storage for files, such as AWS S3.
+
+## Mechanics
+
+Stateless services keep no local durable data and can be replaced freely. Stateful components attach volumes. In-memory stores such as Redis serve caches and counters at high speed but lose data on restart unless configured to persist. Object storage holds files and backups outside the cluster.
+
+## Best practices
+
+- Keep services stateless where possible.
+- Document and test backup and restore procedures.
+- Use caches for data that can be regenerated, not as a system of record.
+- Never cache results produced by a fallback path, so that a degraded answer is not served after recovery.
+
+## In the Tamani Platform
+
+Redis provides the job queue, the semantic cache and the rate-limiter backend. Application services are stateless and serve read traffic from a bundled snapshot. Backups are stored in an S3 bucket with a lifecycle rule that expires old objects.
+
+---
+
+# 7. Infrastructure as Code
+
+Infrastructure as Code (IaC) defines cloud infrastructure in text files that are applied by tooling, rather than configured by hand in a console.
+
+## Purpose
+
+Manual infrastructure is not reproducible, has no history, and drifts from any documentation. IaC makes infrastructure version-controlled, reviewable and rebuildable.
+
+## Terminology
+
+- **Provider** — the plugin that lets IaC manage a given platform, such as AWS.
+- **Resource** — one managed infrastructure object, such as a virtual machine.
+- **State** — the tool's record of what it has created.
+- **Plan** — a preview of the changes an apply would make.
+- **Drift** — divergence between the real infrastructure and its written definition.
+
+## Mechanics
+
+Resources are declared in configuration files. The tool compares the configuration against its state and the real infrastructure, produces a plan, and on apply creates, updates or deletes resources to match. Re-running a plan against unchanged configuration reports no changes, confirming zero drift.
+
+## Best practices
+
+- Keep configuration in version control.
+- Store state remotely and lock it during operations.
+- Review the plan before every apply.
+- Keep secret values out of configuration and state.
+
+## In the Tamani Platform
+
+Infrastructure is defined with OpenTofu (an open-source fork of Terraform): a single cloud node, an elastic IP, a DNS zone, a backup bucket and a scoped IAM identity. A drift check after apply reports no changes. Secret values are never placed in configuration or state.
+
+---
+
+# 8. AWS
+
+Amazon Web Services (AWS) is a cloud provider that rents computing, storage, networking and managed services on demand.
+
+## Purpose
+
+Renting infrastructure removes the need to own hardware, allows scaling up and down, and provides managed services (DNS, storage, secret stores) that would otherwise require operating dedicated software.
+
+## Terminology
+
+- **EC2** — virtual machine instances.
+- **Elastic IP** — a fixed public address that can be reassigned.
+- **Route 53** — the DNS service.
+- **S3** — object storage.
+- **SSM Parameter Store** — a store for configuration values and secrets.
+- **IAM** — the identity and access-management system controlling who can do what.
+- **Security group** — a firewall attached to an instance.
+
+## Mechanics
+
+Resources are provisioned in a region. Access is governed by IAM identities and policies that grant least-privilege permissions. A security group restricts which ports are reachable and from where. Managed services such as DNS and secret storage are consumed through their APIs rather than run directly.
+
+## Best practices
+
+- Grant least-privilege IAM permissions scoped to specific resources.
+- Restrict administrative ports to known addresses.
+- Use managed services for DNS, storage and secrets rather than self-hosting.
+- Keep credentials out of source control.
+
+## In the Tamani Platform
+
+A single EC2 instance in the London region runs the cluster, fronted by an elastic IP. Route 53 hosts the DNS zone for the domain. S3 stores backups. SSM Parameter Store holds the model provider key. A dedicated IAM identity has read-only access limited to that one parameter path. The security group restricts SSH and the cluster API to a known address.
+
+---
+
+# 9. CI/CD
+
+Continuous Integration and Continuous Delivery (CI/CD) automate testing, building and packaging of software on every change.
+
+## Purpose
+
+Manual build and test steps are slow and inconsistent. Automating them on every push catches regressions early and produces trusted, repeatable build artifacts.
+
+## Terminology
+
+- **Pipeline** — the automated sequence of steps run on a change.
+- **Workflow / job / step** — the units of a pipeline.
+- **Runner** — the machine that executes the pipeline.
+- **Artifact** — an output of the pipeline, such as a container image.
+- **Gate** — a check that must pass before the pipeline proceeds.
+
+## Mechanics
+
+A change to the repository triggers the pipeline. It runs tests, and on success builds and pushes container images to a registry. Additional steps can scan for vulnerabilities, generate a software bill of materials, sign the image and check for leaked secrets. A failing gate stops the pipeline.
+
+## Best practices
+
+- Run the full test suite on every change.
+- Build once and promote the same artifact through environments.
+- Fail the build on critical vulnerabilities, with an explicit, time-limited exception process.
+- Scan for committed secrets.
+- Sign artifacts so their origin can be verified.
+
+## In the Tamani Platform
+
+GitHub Actions runs the tests, then builds and pushes images to GitHub Container Registry. The pipeline scans images with Trivy and fails on fixable critical vulnerabilities, generates an SBOM with Syft, signs images with Cosign, and scans the repository history for secrets with Gitleaks. A separate evaluation gate scores AI classifier changes against a golden set and blocks regressions.
+
+---
+
+# 10. GitOps
+
+GitOps is a delivery model in which the Git repository is the single source of truth for the desired state of a system, and software continuously reconciles the running system to match it.
+
+## Purpose
+
+Deploying by running commands against a cluster is error-prone and undocumented. GitOps makes every change a commit, gives deployments a full history, and makes recovery a matter of pointing the reconciler back at the repository.
+
+## Terminology
+
+- **Reconciliation** — the continuous process of making actual state match declared state.
+- **App-of-apps** — a pattern where one root application defines all others.
+- **Sync wave** — an ordering mechanism for dependent resources.
+- **Automated vs manual sync** — whether changes apply immediately or require human approval.
+- **Image pinning** — deploying an exact image version identified by commit or digest.
+
+## Mechanics
+
+A reconciler running in the cluster watches the repository. When the repository changes, it applies the difference to the cluster. Environments can differ in trust: development can sync automatically, while production requires a deliberate human sync. Pinning images by commit identifier makes the running version precisely known.
+
+## Best practices
+
+- Make the repository the only way to change the cluster.
+- Require manual approval for production promotion.
+- Pin production images by exact version.
+- Order dependent resources with sync waves.
+- Verify the deployed artifact, not only the reconciler's status.
+
+## In the Tamani Platform
+
+Argo CD runs in the cluster and reconciles it from the repository using a read-only deploy key. An app-of-apps root application defines all others. Platform configuration syncs automatically; production workloads require a manual sync. Production images are pinned by commit SHA.
+
+---
+
+# 11. Observability
+
+Observability is the ability to understand a system's internal state from its external outputs: metrics, logs and traces. Service Level Objectives (SLOs) express reliability targets against those signals.
+
+## Purpose
+
+A running system fails in ways that are invisible without measurement. Observability makes failures detectable, diagnosable and quantifiable, and SLOs turn "is it healthy" into a measurable target.
+
+## Terminology
+
+- **Metric** — a numeric measurement over time, such as requests per second.
+- **Log** — a timestamped record of an event.
+- **Trace** — the path of a single request across services.
+- **SLI** — a Service Level Indicator; a measured ratio of good events to valid events.
+- **SLO** — a Service Level Objective; a target for an SLI, such as 99.5% availability.
+- **Error budget** — the allowed amount of failure implied by an SLO.
+- **Burn rate** — how fast the error budget is being consumed.
+
+## Mechanics
+
+Services expose metrics that a collector scrapes on a schedule. Logs are shipped to a central store and queried by correlation identifier. SLIs are computed from metrics with recording rules. Alerts fire when the error budget burns too fast: a fast burn pages immediately, a slow burn raises a ticket. Dashboards present the results by audience.
+
+## Best practices
+
+- Define SLIs as a ratio of good events to valid events.
+- Alert on error-budget burn rate, using multiple windows to reduce noise.
+- Attach a correlation identifier to every request and log line.
+- Split dashboards by audience: service health, spend, and so on.
+- Watch metric cardinality; high-cardinality labels can exhaust the metrics store.
+
+## In the Tamani Platform
+
+Prometheus scrapes application and platform metrics; Loki stores logs; Grafana presents dashboards. SLOs define 99.5% availability and 95% of requests under 400 milliseconds. Recording rules compute the error ratio, and multi-window burn-rate alerts page on fast burns and ticket on slow burns. Two dashboards separate service health from AI spend.
+
+---
+
+# 12. Messaging
+
+A message system moves work between services asynchronously through durable queues, rather than through direct synchronous calls.
+
+## Purpose
+
+Work that does not need an immediate answer should not block a request. A queue lets a producer hand off work and a consumer process it at its own pace, and lets work wait safely when consumers are unavailable.
+
+## Terminology
+
+- **Stream** — a durable, ordered log of messages.
+- **Subject** — a message's address, often hierarchical.
+- **Consumer** — a reader's position in a stream.
+- **Consumer group** — multiple workers sharing one stream, each message going to one member.
+- **At-least-once delivery** — the guarantee that a message is delivered one or more times.
+- **Idempotency** — the property that processing the same message twice has no additional effect.
+- **Dead letter queue** — a place for messages that repeatedly fail.
+- **Poison message** — a malformed message that crashes consumers if retried.
+- **Consumer lag** — the number of unprocessed messages.
+
+## Mechanics
+
+Producers publish messages to subjects on a durable stream. A consumer group shares the stream so each message is handled once. A worker acknowledges a message only after completing the work; an unacknowledged message is redelivered. Failed messages are retried with growing delays and moved to a dead letter queue after a limit. Malformed messages are quarantined immediately. Consumer lag can drive autoscaling.
+
+## Best practices
+
+- Acknowledge only after work completes, so a crash redelivers rather than loses work.
+- Make every consumer idempotent, using an idempotency key written after success.
+- Retry with exponential backoff and cap redelivery.
+- Quarantine poison messages instead of retrying them.
+- Configure retention by age and size to bound stream growth.
+- Use consumer lag, not CPU, as the autoscaling signal for worker pools.
+
+## In the Tamani Platform
+
+NATS JetStream carries enrichment events on a hierarchical subject scheme. Workers form a durable consumer group, acknowledge after completion, and use idempotency keys written only on success. Failures retry with exponential backoff and dead-letter after five deliveries; malformed messages are quarantined. Retention is bounded by age and size, and a replay tool can reprocess from any sequence.
+
+---
+
+# 13. AI Gateway
+
+An inference gateway is a single service that owns every call to a language-model provider, adding access control, caching, cost accounting and fallback around it.
+
+## Purpose
+
+Calling a provider directly from application code scatters keys, spending and behaviour across the system. Routing all calls through one gateway centralises control and makes cost and reliability measurable and enforceable.
+
+## Terminology
+
+- **Inference** — obtaining a result from a trained model.
+- **Structured output** — constraining a model to return data matching a schema.
+- **Semantic cache** — a cache keyed by meaning, using embeddings and similarity, rather than exact match.
+- **Embedding** — a numeric vector representing the meaning of text.
+- **Token budget** — a per-caller limit on token spend.
+- **Circuit breaker** — a mechanism that stops calling a failing dependency and falls back.
+- **Prompt versioning** — treating each prompt as a versioned artifact.
+
+## Mechanics
+
+A request passes through tenant authentication, a token-budget check, and a semantic-cache lookup. If a stored answer is similar enough, it is returned without a provider call. Otherwise the provider is called with structured output enforced, the result is cached and recorded in a cost ledger, and returned. A circuit breaker falls back to a cheap local result if the provider is unhealthy.
+
+## Best practices
+
+- Keep provider keys out of application code; concentrate them in the gateway.
+- Enforce structured output so responses are valid by construction.
+- Tune the semantic-cache threshold against real data, measuring false-hit rate.
+- Enforce per-tenant budgets rather than only observing spend.
+- Version prompts and record the version on every result.
+- Never cache fallback output.
+
+## In the Tamani Platform
+
+The gateway calls the model provider through the official SDK with structured output. A semantic cache uses locally-computed embeddings; the similarity threshold was set to 0.94 after measuring hit and false-hit rates across 400 venues. Per-tenant token budgets return a rate-limit response when exhausted. A circuit breaker falls back to a deterministic classifier. Prompts are versioned artifacts, and every request is written to a cost ledger.
+
+---
+
+# 14. Security
+
+Security here covers admission control, image signing, vulnerability scanning, and secret management: ensuring only trusted, scanned, signed workloads run, and that secrets are never exposed.
+
+## Purpose
+
+A cluster that runs any image, or holds secrets in plain files, is exposed to supply-chain attacks and leaks. Enforcing provenance and centralising secrets reduces this risk.
+
+## Terminology
+
+- **Admission controller** — a component that inspects and can reject resources before they run.
+- **Policy** — a rule the admission controller enforces.
+- **Image signing** — attaching a verifiable signature proving an image's origin.
+- **Keyless signing** — signing tied to a workflow identity rather than a stored key.
+- **SBOM** — a Software Bill of Materials listing an image's contents.
+- **Secret store** — a managed system holding secret values outside the cluster and Git.
+
+## Mechanics
+
+An admission controller evaluates every resource against policies and rejects violations: unsigned images, missing resource limits, dangerous privileges. Images are signed during the build using a workflow identity, and the cluster verifies the signature before admitting them. Secrets live in a managed store and are synced into the cluster by an operator, never committed to Git.
+
+## Best practices
+
+- Reject unsigned images and images with mutable tags.
+- Require resource limits and forbid privileged containers at admission.
+- Sign images with a workflow identity rather than a long-lived key.
+- Scan images and generate an SBOM in the pipeline.
+- Store secrets in a managed store and sync them in with least-privilege access.
+
+## In the Tamani Platform
+
+Kyverno enforces admission policies: pinned image tags, required resource limits, required labels, and verified signatures for images from the project registry. CI signs images with Cosign using GitHub's workflow identity; the cluster rejects unsigned images, verified by attempting to run one. External Secrets Operator syncs the provider key from SSM Parameter Store using a read-only identity.
+
+---
+
+# 15. Reliability
+
+Reliability engineering proves and improves a system's behaviour under load and failure, through load testing, chaos experiments and blameless postmortems.
+
+## Purpose
+
+A system's limits and failure modes are unknown until tested. Deliberately loading and breaking it under controlled conditions reveals its saturation point and confirms whether its safety mechanisms work.
+
+## Terminology
+
+- **Load test** — driving controlled traffic to measure capacity and latency.
+- **Saturation point** — the load at which a resource is exhausted.
+- **Limiting resource** — the resource that saturates first.
+- **Chaos experiment** — a deliberate fault injected with a stated hypothesis.
+- **Postmortem** — a blameless write-up of an incident and its lessons.
+- **Runbook** — a documented procedure for responding to an alert.
+
+## Mechanics
+
+Load tests raise traffic in stages while measuring latency and error rate, identifying the saturation point and the limiting resource. Chaos experiments state a hypothesis, inject a fault (killing a pod, adding latency), and record the result against the hypothesis. Incidents are written up as postmortems focused on why the system permitted the failure, and each alert gains a runbook.
+
+## Best practices
+
+- State a hypothesis before each experiment and record the result against it.
+- Identify the limiting resource, not only the breaking point.
+- Write blameless postmortems that fix the class of failure, not only the symptom.
+- Maintain a runbook for every alert that can fire.
+- Encode corrective actions as code so they persist.
+
+## In the Tamani Platform
+
+Load testing with k6 found a saturation point around 25–30 concurrent users, limited by memory because the whole platform shares one small node. Chaos experiments confirmed that killing an API replica caused no user-visible errors, and that killing the single-replica gateway caused a 20-second automatic-recovery gap. Three incidents were written up as blameless postmortems, and each alert has a runbook.
+
+---
+
+# 16. Platform Engineering Practices
+
+Platform engineering practices are the disciplines that make a platform maintainable and trustworthy: documented decisions, versioned configuration, and standardised operability.
+
+## Purpose
+
+A platform without recorded reasoning, versioned configuration and consistent standards becomes unmaintainable as it grows and as knowledge is lost.
+
+## Terminology
+
+- **ADR** — an Architecture Decision Record documenting a significant choice.
+- **Monorepo** — a single repository holding application code, infrastructure and configuration.
+- **Golden path** — the supported, standardised way to build and run a service.
+- **Service catalogue** — a record of every service, its owner, dependencies and runbook.
+
+## Mechanics
+
+Significant decisions are recorded as ADRs stating context, options, decision and consequences. Application code, infrastructure and configuration live together in a monorepo so a single change can span them. A golden path defines the standard way to create a service, and a catalogue records ownership and metadata for each.
+
+## Best practices
+
+- Record significant decisions as ADRs at the time they are made.
+- Keep application, infrastructure and configuration in one repository where practical.
+- Standardise service creation through a golden path.
+- Maintain a catalogue of services and their owners.
+
+## In the Tamani Platform
+
+A monorepo holds applications, infrastructure, platform configuration, evaluations, runbooks, the CLI and documentation. ADRs record decisions such as choosing NATS over Kafka and running a single-node cluster. A service catalogue entry is generated for each scaffolded service.
+
+---
+
+# 17. Developer Self-Service
+
+Developer self-service provides a tool that scaffolds and deploys a fully operable service without requiring the developer to know cluster internals.
+
+## Purpose
+
+If each new service must be wired for probes, metrics, policy, security and monitoring by hand, services ship inconsistently and often without operability. A generator makes correctness the default.
+
+## Terminology
+
+- **Scaffolding** — generating a complete service from a template.
+- **Template** — the parameterised source for generated files.
+- **Correctness by default** — the property that generated services are operable without extra work.
+- **Time to first deploy** — the elapsed time from scaffold to serving traffic.
+
+## Mechanics
+
+A command takes a service name and generates every file the service needs: a hardened container definition, health endpoints, metrics, a network policy, a monitoring configuration, an alert, a signed build pipeline, a deployment manifest and a runbook. Committing and pushing the result causes the GitOps reconciler to deploy it. Because the template supplies operability, a service cannot ship without it.
+
+## Best practices
+
+- Generate the full operable set, not just application code.
+- Make the generated pipeline sign and scan images like every other service.
+- Version the templates so upgrades can be applied across services.
+- Measure and record time to first deploy.
+
+## In the Tamani Platform
+
+A CLI scaffolds a service with a hardened Dockerfile, split probes, structured logging, metrics, a network policy, a service monitor, an error-rate alert, a signed CI pipeline, an Argo application, a catalogue entry and a runbook. A scaffolded service went from command to serving live traffic in a measured 195 seconds, and its signed image was admitted through the same signature policy as every other workload.
+
+---
+
+# 18. Cost Optimisation
+
+Cost optimisation measures and reduces the running cost of a system, with particular attention to inference spend in an AI-backed product.
+
+## Purpose
+
+Without measurement, the cost of a feature is unknown and cannot be controlled. For an AI product, inference dominates cost long before compute does, so it is the primary line to measure and reduce.
+
+## Terminology
+
+- **Unit economics** — cost expressed per unit of value, such as per thousand classifications.
+- **Cost attribution** — assigning cost to namespaces, workloads or purposes.
+- **Model tiering** — routing easy work to a cheaper model and hard work to an expensive one.
+- **Crossover point** — the volume at which self-hosting becomes cheaper than a managed provider.
+- **Caching savings** — spend avoided by serving cached results.
+
+## Mechanics
+
+Each request is recorded with its model, tokens, cost and cache status, allowing cost per unit to be computed. Tiering is evaluated by measuring accuracy and cost per model on a fixed test set, then routing by confidence. The self-hosting crossover is found by comparing per-token provider pricing against the hourly cost and throughput of a self-hosted alternative.
+
+## Best practices
+
+- Treat inference as the primary cost line for an AI product.
+- Price input and output tokens separately.
+- State cache savings as money.
+- Measure the accuracy cost of model tiering rather than assuming it.
+- Compute the self-hosting crossover before deciding to self-host.
+
+## In the Tamani Platform
+
+A cost ledger records every request. Measured cost is about 4.01 US dollars per thousand classifications after caching, with a 22% cache saving on early traffic. A tiering experiment measured F1 and cost per model (Haiku, Sonnet, Opus) on the golden set; confidence-based routing is projected to cut blended cost by about 57% for a small accuracy loss. The self-hosting crossover sits far above the workload's volume, so the managed provider is cheaper.
+
+---
+
+*This reference documents the concepts used in the Tamani Platform. Implementation detail lives in the repository: `docs/adr/` for decisions, `runbooks/` for operations and incidents, and `docs/unit-economics.md` for cost figures.*
