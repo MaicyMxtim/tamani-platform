@@ -1,0 +1,18 @@
+# Gitleaks config: keep the full default ruleset, but stop flagging the
+# intentional local-dev placeholder keys. These appear in docs curl examples,
+# docker-compose and the k8s *base* manifests by design (real deployments
+# overlay them with ESO-provided secrets — see Phase 8), so they trip the
+# curl-auth-header rule on every docs edit without any actual leak.
+#
+# Anything that is NOT one of these exact placeholders still fails the scan.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Intentional local-dev placeholder keys — never real credentials"
+regexTarget = "secret"
+regexes = [
+  '''^dev-local-key$''',
+  '''^mobile-local-key$''',
+  '''^agent-local-key$''',
+]
