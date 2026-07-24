@@ -1,21 +1,38 @@
-# Tamani Platform — Build From Scratch
+# Tamani Platform — Complete Guide
 
-A complete, self-contained manual. Start with an empty directory and create every file exactly as shown, running the commands in order. Nothing here assumes an existing repository; the full content of each file is written out.
+A single guide that teaches the concepts and builds the platform from an empty directory. Written for a beginner: every technology is explained before it is used, and every file is written out in full with the reason it exists. Work through it in order.
 
-Create the project root and enter it:
+Each phase first explains the ideas it depends on, then builds the files that use them, then verifies the result before the next phase begins.
+
+Create the project directory and start version control:
+
 ```bash
 mkdir tamani && cd tamani && git init
 ```
 
-Throughout, all paths are relative to this `tamani/` directory.
+All paths below are relative to this `tamani/` directory.
 
 ---
 
 # Phase 0 — Foundation
 
-This phase creates the command surface and project hygiene. The Makefile turns every common operation into one verb; the pre-commit and gitignore files keep the repository clean.
+This phase sets up the project's structure and the tools that keep it tidy. It introduces version control, the idea of a single repository holding everything, and a shortcut file for common commands.
 
-Ignore build artifacts, virtualenvs, local secrets and state:
+## Version control and Git
+
+Version control records every change made to a set of files: what changed, when, and by whom. It allows any past state to be recovered, changes to be reviewed before they take effect, and many people to work on the same files without overwriting each other. Git is the standard version-control tool. A project tracked by Git is called a repository.
+
+## Monorepos
+
+A monorepo is a single repository that holds everything a project needs: the application code, the infrastructure definitions, the configuration and the documentation. Keeping these together means one recorded change can span code and the infrastructure that runs it, and there is one place to look for anything.
+
+## The command line and Make
+
+The command line runs programs by typing their names. Real projects involve many long commands, which are easy to mistype or forget. A Makefile is a file of named shortcuts: typing `make up` runs whatever the Makefile defines for `up`. This makes the workflow reproducible, because the commands live in the project rather than in memory.
+
+## The project files
+
+The `.gitignore` file lists patterns that Git should not track: build outputs, local secrets, and generated state. This keeps sensitive and disposable files out of the repository.
 
 Create **`.gitignore`**:
 
@@ -33,7 +50,7 @@ terraform.tfvars
 results/latest.json
 ```
 
-Every common operation as a single verb:
+The Makefile defines each common operation as a single verb. `make up` starts the whole stack, `make test` runs the tests, `make smoke` checks that services answer. Anyone can run the project without memorising commands.
 
 Create **`Makefile`**:
 
@@ -73,7 +90,7 @@ clean:         ## remove containers, volumes and dangling images
 	docker compose down -v --remove-orphans
 ```
 
-Formatters and linters that run before each commit:
+Pre-commit hooks run automatically before each commit. These format code, check YAML, and scan for accidentally committed secrets, catching problems at the earliest and cheapest point.
 
 Create **`.pre-commit-config.yaml`**:
 
@@ -102,7 +119,7 @@ repos:
       - id: terraform_fmt
 ```
 
-The first Architecture Decision Record, establishing that decisions are documented:
+An Architecture Decision Record (ADR) is a short document capturing a significant choice: its context, the options, the decision and its consequences. This first ADR establishes that decisions will be recorded, turning the repository into evidence of reasoning rather than only output.
 
 Create **`docs/adr/0001-record-architecture-decisions.md`**:
 
@@ -130,17 +147,45 @@ Slower to decide, faster to defend. The repository becomes evidence of
 reasoning rather than output.
 ```
 
-**Check:** `make` with no target lists the verbs; `git status` shows the new files.
+**Check:** `git status` shows the new files; running `make` with no target lists the available verbs.
 
 ---
 
-# Phase 1 — Containerisation and the workload
+# Phase 1 — Containers and the workload
 
-This phase builds the three services and runs the whole stack locally with Docker Compose. Each service is a hardened container with split health probes and structured logging.
+This phase builds the three programs that make up the application and runs them together on one machine. It introduces the core idea of a container and the tools for building and running them.
 
-## The venue API
+## Servers, clients and APIs
 
-The API serves venue search and a feed. It has three distinct health probes, JSON logging with a correlation id, and Prometheus metrics. It reads a bundled snapshot, or a database when `DATABASE_URL` is set:
+A server is a computer that runs software and answers requests from other computers, called clients. An API (Application Programming Interface) is a program on a server that answers structured requests over the internet: a client asks for data in a defined format, and the API returns it, usually as JSON. The venue API in this project answers requests such as "list the late-night venues".
+
+## The consistency problem
+
+Software often behaves differently on different machines because they have different versions of programming languages, libraries and settings. Code that works on one computer can fail on another for reasons unrelated to the code itself. This is the problem containers solve.
+
+## Containers
+
+A container packages a program together with everything it needs to run: the language runtime, the libraries, and the system files. The result behaves the same on any machine. Docker is the standard tool for building and running containers. A container is isolated from the host and from other containers, so several can run side by side without interfering.
+
+## Images and Dockerfiles
+
+An image is the frozen, shippable form of a container: a read-only package containing the program and its dependencies. A running image is a container. A Dockerfile is a text file listing the steps to build an image. Images are stored in a registry and pulled wherever they are needed.
+
+## Multi-stage builds and hardening
+
+A multi-stage build uses a temporary stage to install and compile dependencies, then copies only the finished result into a small final image, so build tools are not shipped. Smaller images download faster and expose less to attackers. Beyond size, a hardened container runs as a non-root user (so a break-in lands in a restricted account), uses a read-only filesystem (so the program cannot alter its own files), and drops unnecessary system privileges.
+
+## Health probes
+
+A health probe is a small endpoint the platform checks to ask whether a program is working. Three kinds answer different questions. Liveness asks only whether the process is responding; if not, restart it. Readiness asks whether the program is ready to serve traffic, checking that its dependencies are reachable; if not, hold traffic back but do not restart. Startup covers the initial boot window. Confusing these causes restart loops, for example restarting a program because its database is down.
+
+## Structured logging
+
+A log is a timestamped record of an event. Structured logging writes each log line as machine-readable data (JSON) rather than free text, so it can be searched reliably. A correlation identifier is a random value attached to a request and carried through every service it touches, so the whole journey of one request can be found by searching for that identifier.
+
+## The API service
+
+The venue API, written with FastAPI (a Python framework for building APIs). It provides the three health probes, JSON logging with a correlation identifier, and metrics for monitoring. It serves venue data from a bundled file, or from a database when one is configured.
 
 Create **`apps/api/main.py`**:
 
@@ -330,6 +375,8 @@ def feed(limit: int = Query(default=20, le=100)):
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 ```
 
+The list of Python libraries the API depends on, pinned to exact versions so builds are reproducible.
+
 Create **`apps/api/requirements.txt`**:
 
 ```text
@@ -339,7 +386,7 @@ prometheus-fastapi-instrumentator==7.0.2
 psycopg[binary]==3.2.6
 ```
 
-A multi-stage build: dependencies compiled in a builder stage, only the result copied into a slim, non-root, read-only final image:
+The recipe for the API's image. It uses a multi-stage build and the hardening described above: a non-root user, a read-only filesystem and dropped privileges.
 
 Create **`apps/api/Dockerfile`**:
 
@@ -364,7 +411,7 @@ EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-Unit tests for the API:
+Automated tests that confirm the API's endpoints behave correctly. These run in the pipeline on every change.
 
 Create **`apps/api/tests/test_api.py`**:
 
@@ -433,11 +480,11 @@ def test_correlation_id_propagates():
     assert r.headers["x-correlation-id"] == "abc123"
 ```
 
-> The venue dataset (`apps/api/data/venues.static.json`, ~1,275 records) is a one-time export from the source app's data. It is too large to list here; for a reproduction, any list of objects with `id`, `name`, `area`, `type_label`, `band_label`, `tags`, `rating` and `rating_count` fields works. Place it at `apps/api/data/venues.static.json`.
+The venue dataset (`apps/api/data/venues.static.json`) is a one-time export of about 1,275 records. It is too large to list; any list of objects with `id`, `name`, `area`, `type_label`, `band_label`, `tags`, `rating` and `rating_count` fields works. Place it at that path.
 
-## The inference gateway (initial skeleton)
+## The inference gateway
 
-At this stage the gateway uses a mock classifier so the stack runs with no API key. Phase 5 replaces the internals with the real provider, cache and budgets. Create the Phase 5 version directly if preferred; the final content is shown in Phase 5.
+The inference gateway is the only program allowed to contact the AI model provider. Concentrating those calls in one service is what makes spending, caching and access controllable later. At this stage it uses a mock so the stack runs with no API key; Phase 5 replaces its internals. The final files are shown in Phase 5; its dependencies and image recipe are below.
 
 Create **`apps/gateway/requirements.txt`**:
 
@@ -451,7 +498,7 @@ anthropic==0.116.0
 fastembed==0.4.2
 ```
 
-The gateway Dockerfile. It bakes the embedding model into the image in Phase 5; the base hardening is the same as the API:
+The gateway's image recipe. It bakes an embedding model into the image (used in Phase 5) so the running container never downloads anything.
 
 Create **`apps/gateway/Dockerfile`**:
 
@@ -481,7 +528,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
 
 ## The worker
 
-The worker consumes enrichment jobs from NATS. The full delivery semantics (backoff, dead-letter, quarantine) are covered in Phase 4; this is the final content:
+The worker performs background jobs so that slow work does not block the API. It takes jobs from a queue and processes them at its own pace. Its full behaviour is covered in Phase 4; the final file is shown here.
 
 Create **`apps/worker/main.py`**:
 
@@ -722,9 +769,11 @@ USER 10001
 CMD ["python", "main.py"]
 ```
 
-## Running the stack locally
+## Docker Compose and the supporting services
 
-Compose runs all services plus their dependencies:
+Docker Compose starts many containers together from one file. Besides the three programs, the stack includes Redis (a fast in-memory store used for the cache, the job queue and rate limiting), NATS (the message system), Postgres (a database), Prometheus (which collects metrics) and Grafana (which draws dashboards from them).
+
+The Compose file declares every service, how to build or pull it, its ports and its environment, on a shared network where they reach each other by name.
 
 Create **`docker-compose.yml`**:
 
@@ -797,7 +846,7 @@ volumes:
   pgdata:
 ```
 
-Local Prometheus scrape configuration:
+Tells the local Prometheus which services to collect metrics from.
 
 Create **`ops/prometheus/prometheus.yml`**:
 
@@ -818,7 +867,7 @@ scrape_configs:
       - targets: ["nats:8222"]
 ```
 
-Point local Grafana at local Prometheus:
+Points the local Grafana at the local Prometheus so dashboards have data.
 
 Create **`ops/grafana/provisioning/datasources/prometheus.yml`**:
 
@@ -832,30 +881,66 @@ datasources:
     isDefault: true
 ```
 
-Start and smoke-test the stack:
 
 ```bash
 make up      # build and start everything
-make smoke   # verify every service answers
+make smoke   # check every service answers
 ```
 
-**Check:** `make smoke` returns `ok` from the health endpoints and a classification from the gateway; `docker compose ps` shows every service Up.
+**Check:** `make smoke` returns `ok` from the health endpoints and a classification from the gateway; `docker compose ps` shows every service running.
 
 ---
 
 # Phase 2 — The Kubernetes platform
 
-This phase runs the services on a local Kubernetes cluster with namespaces, quotas, RBAC, default-deny networking and admission control.
+This phase runs the services on Kubernetes, with strong separation between environments and rules that limit what any workload can do. It introduces the central technology of the whole project.
 
-Start a cluster with Calico, which actually enforces NetworkPolicy:
+## Kubernetes
+
+Docker runs one container; Kubernetes runs many across one or more machines and keeps them running. It is given a written description of the desired state — for example "run two copies of the API, restart them if they fail" — and works continuously to make reality match it. This style is called declarative: the destination is declared, and the system works out the steps.
+
+## Clusters and nodes
+
+A cluster is a set of machines Kubernetes manages as one unit. A node is one machine in the cluster. This project runs a small cluster locally (with minikube) for building and testing, and a real one on a single cloud machine (with k3s) for the live system.
+
+## Pods, deployments and services
+
+A pod is the smallest unit Kubernetes runs, usually a single container. A deployment keeps a chosen number of identical pods running and manages upgrades by replacing them gradually. A service gives a set of pods a stable internal name, such as `tamani-api`, so other programs can reach them even as individual pods come and go.
+
+## Namespaces
+
+A namespace is a partition inside a cluster. This project uses three — for development, staging and production — so the environments cannot interfere with one another and can have different limits and permissions.
+
+## Manifests
+
+A manifest is a YAML file declaring a desired resource, such as a deployment or a service. Applying a manifest tells Kubernetes what should exist; the system then makes it so and keeps it that way.
+
+## Resource quotas and limits
+
+A resource quota caps how much processor time, memory and how many objects a namespace may use. A limit range supplies sensible defaults for containers that do not state their own. Together they stop one workload from starving the others.
+
+## Role-based access control (RBAC)
+
+Role-based access control governs who may do what in the cluster. A role is a set of permitted actions on particular resources; a binding grants a role to a person or program. It exists to enforce least privilege: each user or workload is given only the permissions its job requires, so a mistake or a compromise has limited reach. This project defines a developer role that can read pods and logs but delete nothing, and a deployer role that can update workloads and nothing else.
+
+## Network policy
+
+By default every pod in a cluster can talk to every other pod. A network policy is a firewall between pods that restricts this. The safe pattern is default-deny: block all traffic, then open only the specific paths required. One consequence to remember is that default-deny also blocks DNS — the service that turns names like `redis` into addresses — so DNS must be re-allowed explicitly or nothing can find anything.
+
+## Pod security and admission control
+
+Pod security standards forbid pods from requesting dangerous privileges, such as running as the all-powerful root account. Admission control is a check that inspects every resource entering the cluster and rejects rule-breakers before they run. This project uses Kyverno, an admission controller, to reject images with ambiguous tags, containers without resource limits, and workloads missing required labels.
+
+## The tenancy manifests
+
+Start a local cluster. Calico is a network plugin that actually enforces network policy; minikube's default one silently ignores it.
+
 
 ```bash
 minikube start --cni=calico --memory=6g --cpus=4
 ```
 
-## Tenancy: namespaces, quotas, RBAC
-
-Three namespaces with restricted Pod Security:
+Creates the three namespaces, each set to the restricted pod-security level.
 
 Create **`platform/k8s/tenancy/namespaces.yaml`**:
 
@@ -890,7 +975,7 @@ metadata:
     pod-security.kubernetes.io/warn: restricted
 ```
 
-A ResourceQuota and LimitRange per namespace:
+Sets a resource quota and default limits for each namespace.
 
 Create **`platform/k8s/tenancy/quotas.yaml`**:
 
@@ -988,7 +1073,7 @@ spec:
         memory: 256Mi
 ```
 
-Developer and deployer roles, each least-privilege:
+Defines the developer and deployer roles and binds them.
 
 Create **`platform/k8s/tenancy/rbac.yaml`**:
 
@@ -1051,9 +1136,9 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-## Workload manifests (base and overlays)
+## The workload manifests
 
-Default-deny for all traffic, with DNS egress explicitly re-opened:
+Blocks all pod traffic by default, then re-allows DNS so name resolution still works.
 
 Create **`platform/k8s/base/netpol-default.yaml`**:
 
@@ -1086,6 +1171,8 @@ spec:
         - protocol: TCP
           port: 53
 ```
+
+Declares the API deployment and service, with resource limits, the three probes, and the security settings.
 
 Create **`platform/k8s/base/api/api.yaml`**:
 
@@ -1163,7 +1250,7 @@ spec:
         - port: 8000
 ```
 
-A PodDisruptionBudget so a replica survives disruption (added in Phase 9; include now):
+A pod disruption budget, ensuring at least one API pod always survives a voluntary disruption such as a drain (explained further in Phase 9; included now).
 
 Create **`platform/k8s/base/api/pdb.yaml`**:
 
@@ -1179,6 +1266,8 @@ spec:
   selector:
     matchLabels: { app: tamani-api }
 ```
+
+The gateway deployment and service, plus a network policy allowing only the worker to call it and only its own outbound paths.
 
 Create **`platform/k8s/base/gateway/gateway.yaml`**:
 
@@ -1478,7 +1567,7 @@ spec:
         - port: 4222
 ```
 
-The base kustomization ties the manifests together:
+A kustomization lists the manifests that form one bundle. This base is shared by all environments.
 
 Create **`platform/k8s/base/kustomization.yaml`**:
 
@@ -1495,7 +1584,7 @@ resources:
   - nats/nats.yaml
 ```
 
-The dev overlay:
+An overlay adjusts the base for one environment. The dev overlay sets development image tags.
 
 Create **`platform/k8s/overlays/dev/kustomization.yaml`**:
 
@@ -1531,7 +1620,7 @@ images:
     newTag: staging
 ```
 
-The prod overlay pins images by commit and wires production settings:
+The production overlay pins images to exact versions and sets production replica counts and settings.
 
 Create **`platform/k8s/overlays/prod/kustomization.yaml`**:
 
@@ -1597,9 +1686,7 @@ patches:
           limits: { cpu: "1", memory: 768Mi }
 ```
 
-## Admission policy
-
-Kyverno policies: pinned tags, required limits, required labels:
+The Kyverno admission policies: forbid ambiguous image tags, require resource limits, require labels.
 
 Create **`platform/policies/baseline.yaml`**:
 
@@ -1680,7 +1767,8 @@ spec:
               app: "?*"
 ```
 
-Apply tenancy, build images into the cluster, deploy dev, install Kyverno:
+Apply the tenancy, build the images into the cluster, deploy the dev environment, and install the admission controller and its policies. (`kubectl` is the command-line tool for a cluster; `helm` installs third-party components.)
+
 
 ```bash
 kubectl apply -f platform/k8s/tenancy/
@@ -1694,15 +1782,37 @@ helm install kyverno kyverno/kyverno -n kyverno --create-namespace --wait
 kubectl apply -f platform/policies/baseline.yaml
 ```
 
-**Check:** `kubectl auth can-i delete deployments -n tamani-dev --as=jane --as-group=tamani:developers` returns `no`; a `nginx:latest` pod is refused at admission; the API pod cannot reach the gateway (default-deny) while the worker can.
+**Check:** Asking the cluster whether the developer role may delete deployments returns `no`; a pod using an ambiguous `latest` tag is refused at admission; the API pod cannot reach the gateway while the worker can.
 
 ---
 
 # Phase 4 — The event backbone
 
-The worker (created in Phase 1) already implements the delivery semantics: at-least-once with idempotency keys, explicit ack after completion, exponential-backoff retries, dead-lettering and poison-message quarantine. This phase adds the replay tool and the decision record.
+This phase makes the movement of background work reliable, so no job is lost even when programs crash. The worker built in Phase 1 already contains this behaviour; the concepts explain why it is written that way.
 
-Replay messages from a chosen sequence for backfill:
+## Synchronous and asynchronous work
+
+Synchronous work happens while the caller waits for an answer. Asynchronous work is handed off to be done later, freeing the caller to continue. Work that does not need an immediate answer, such as re-classifying many venues, should be asynchronous so it does not block fast requests.
+
+## Message queues and streams
+
+A message queue moves work between programs. A producer places a message on the queue; a consumer takes it off and processes it. A stream is a durable, ordered log of messages saved to disk, so messages survive restarts. This project uses NATS JetStream. A subject is a message's address, and a consumer group lets several workers share a stream with each message going to exactly one of them.
+
+## Delivery guarantees and idempotency
+
+At-least-once delivery means a message is delivered one or more times — occasionally more than once. To make that safe, every consumer must be idempotent: processing the same message twice has no additional effect. This is achieved with an idempotency key recorded after the work succeeds, so a repeat is recognised and skipped.
+
+## Acknowledgement and redelivery
+
+A worker acknowledges a message only after completing the work. If it crashes before acknowledging, the message is redelivered to another worker rather than lost. Acknowledging on receipt instead of on completion silently loses work whenever a worker restarts mid-task.
+
+## Dead letter queues and poison messages
+
+A message that keeps failing is retried with growing delays (exponential backoff) and, after a limit, moved to a dead letter queue for inspection rather than retried forever. A poison message is a malformed message that crashes any consumer that reads it; it is quarantined immediately so it cannot take down the whole worker pool.
+
+## The replay tool and decision record
+
+Re-sends messages from a chosen point in the stream, used to reprocess history after a change to how work is done.
 
 Create **`apps/worker/replay.py`**:
 
@@ -1772,7 +1882,7 @@ if __name__ == "__main__":
     asyncio.run(main(args.from_seq, args.dry_run))
 ```
 
-The decision record for choosing NATS:
+The decision record explaining why NATS was chosen over the alternatives, weighing durability and features against operational weight.
 
 Create **`docs/adr/0002-nats-jetstream-over-kafka-and-redis-streams.md`**:
 
@@ -1820,21 +1930,52 @@ multi-datacentre replication or compacted change logs, revisit Kafka —
 the publish/consume seam keeps that swap contained.
 ```
 
-**Check:** Publishing invalid JSON quarantines it; aever-failing message dead-letters after five deliveries with visible backoff; a killed worker's message is completed by another.
+**Check:** Invalid data is quarantined without crashing the workers; a message that always fails moves to the dead-letter subject after five attempts with visible backoff; a worker killed mid-message has its work completed by another.
 
 ---
 
 # Phase 5 — The inference gateway
 
-This phase replaces the gateway skeleton with the real provider integration, semantic cache, per-tenant budgets, circuit breaker and cost ledger.
+This phase connects a real AI model and surrounds it with cost control, caching and safety. It replaces the gateway skeleton from Phase 1.
 
-Provide the provider key locally (the file is gitignored):
+## Language models and inference
+
+A language model is a trained program that produces text in response to a prompt. Inference means obtaining a result from such a model. Each inference call costs money, charged per unit of text (tokens), so calls must be controlled and measured.
+
+## The single-gateway pattern
+
+Routing every model call through one service means the provider key exists in only one place, and spending, caching and access rules are enforced centrally rather than scattered across the system. No other program holds the key or calls the provider directly.
+
+## Structured output
+
+Structured output constrains the model to return data matching a fixed schema, so the response is valid by construction and does not need fragile parsing. This project requires the classifier to return a defined set of vibe tags and a confidence value.
+
+## Embeddings and semantic caching
+
+An embedding is a list of numbers representing the meaning of a piece of text; similar meanings produce similar numbers. A semantic cache uses embeddings to recognise that a new request is close enough in meaning to a previous one and returns the stored answer without calling the provider. The similarity threshold is tuned against real data, because too loose a threshold serves confidently wrong answers.
+
+## Token budgets and rate limiting
+
+A token budget is a per-caller limit on how much text may be spent, enforced per minute and per day. A caller that exceeds its budget is refused with a retry-after signal. This is enforcement, not merely observation: an over-budget caller is throttled automatically.
+
+## Circuit breakers and fallback
+
+A circuit breaker stops calling a dependency that is repeatedly failing and falls back to a safe alternative, so a provider outage degrades the service instead of breaking it. This gateway falls back to a deterministic local classifier, and never caches those fallback results.
+
+## Prompt versioning and cost ledgers
+
+The prompt is treated as a versioned artifact stored in the repository, and the version is recorded alongside every classification, so any result can be traced to the exact prompt that produced it. A cost ledger records every request's model, tokens and cost, making spend measurable.
+
+## The gateway files
+
+Provide the provider key locally. The `.env` file is ignored by Git, so the key never enters version control.
+
 
 ```bash
 echo 'ANTHROPIC_API_KEY=sk-ant-YOUR-KEY' > .env
 ```
 
-The classification prompt, a versioned artifact:
+The classification prompt. Each prompt is a separate, versioned file.
 
 Create **`apps/gateway/prompts/classify_v1.md`**:
 
@@ -1859,7 +2000,7 @@ confidence between 0 and 1 reflecting how well the description supports
 your tags: short or vague descriptions mean low confidence.
 ```
 
-The provider layer: real calls with structured output, a circuit breaker, and a deterministic mock fallback:
+The provider layer: real model calls with structured output, pricing, a circuit breaker, and the deterministic mock fallback.
 
 Create **`apps/gateway/provider.py`**:
 
@@ -2056,7 +2197,7 @@ def classify(description: str) -> dict:
         return classify_mock(description)
 ```
 
-The semantic cache: local embeddings compared by cosine similarity:
+The semantic cache: it computes embeddings locally and compares them by similarity, so caching adds no provider cost.
 
 Create **`apps/gateway/semcache.py`**:
 
@@ -2121,7 +2262,7 @@ def store(r, prompt_version: str, text: str, vec: np.ndarray, body: dict):
     ))
 ```
 
-Per-tenant token budgets, enforced per minute and per day:
+The per-tenant token budgets, enforced per minute and per day.
 
 Create **`apps/gateway/budget.py`**:
 
@@ -2171,7 +2312,7 @@ def consume(r, tenant: str, tokens: int):
     pipe.execute()
 ```
 
-The gateway request path, tying it together:
+The request path that ties it together: authenticate, check the budget, look in the cache, call the provider on a miss, store the result, record the cost.
 
 Create **`apps/gateway/main.py`**:
 
@@ -2424,7 +2565,6 @@ def readiness():
 Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 ```
 
-Rebuild and test a live classification:
 
 ```bash
 make up
@@ -2433,17 +2573,37 @@ curl -s -X POST http://localhost:8001/v1/classify \
   -d '{"venue_id":"t1","description":"late night cocktail bar"}'
 ```
 
-**Check:** The first classification calls the provider and reports a real cost; a near-duplicate description returns `"cached": true` at zero cost; `GET /v1/costs` reports spend and cache savings.
+**Check:** The first classification calls the provider and reports a real cost; a near-duplicate description returns a cached result at zero cost; the `/v1/costs` endpoint reports spend and cache savings.
 
 ---
 
-# Phase 6 — Golden set, evaluation, and governed agents
+# Phase 6 — Evaluation and governed agents
 
-This phase creates the human-labelled golden set, the scoring harness and CI gate, and two agents governed by a shared runtime.
+This phase measures the AI's accuracy against human judgement, guards it in the pipeline, and builds two agents kept safe by a governance layer.
 
-## The labelling tool and golden set
+## AI agents
 
-Generates a browser-based labelling page from the venue data. Run it, open `tools/labeler.html`, label the venues, and export `evals/golden_set.jsonl`:
+An AI agent is a program that uses a model to decide which actions to take, in a loop, to accomplish a task. Agents are powerful but risky: without limits they can loop, overspend, or take unintended actions. Making them safe to run unattended is the real engineering.
+
+## Evaluation, golden sets, precision and recall
+
+A golden set is a collection of examples judged by a human, used as the standard of correct answers. Evaluation runs the model over the golden set and scores it. Precision is the share of the model's assigned tags that were correct; recall is the share of the correct tags that the model found. Together they describe accuracy for a task where several tags can apply.
+
+## Regression gates
+
+A regression gate is an automated check that blocks a change if it makes a measured result worse. Here, any change to the classifier is scored against the golden set, and the pipeline fails if accuracy drops beyond a tolerance, so an apparently reasonable prompt change cannot silently degrade quality.
+
+## Agent governance
+
+The governance layer is a runtime that surrounds an agent and enforces limits. A capability manifest lists the only tools the agent may use; anything outside it is refused. Budgets cap the tokens, wall-clock time and number of actions per run. Loop detection halts an agent repeating the same action, the most common runaway failure. A dry-run mode records every action without performing side effects, for safe validation. Every action is traced for inspection.
+
+## Least privilege for agents
+
+The operations agent is additionally restricted at the infrastructure level: its cluster identity may only read (get, list and watch), never change anything. It produces a diagnosis and opens a pull request for a human to approve, rather than acting directly.
+
+## Building the golden set
+
+Generates a browser page for labelling venues. It is run once, the venues are labelled by hand, and the result is exported to `evals/golden_set.jsonl`.
 
 Create **`evals/make_labeler.py`**:
 
@@ -2630,17 +2790,16 @@ print(f"wrote {out} with {len(items)} venues "
       f"({len(untagged)} previously untagged, AI-prefilled)")
 ```
 
-Generate the page, label, and place the export:
 
 ```bash
 python3 evals/make_labeler.py
-open tools/labeler.html   # label, then Export to Downloads
+open tools/labeler.html          # label the venues, then Export
 mv ~/Downloads/golden_set.jsonl evals/golden_set.jsonl
 ```
 
-## Evaluation harness and CI gate
+## The evaluation harness and gate
 
-Scores the classifier against the golden set:
+Sends every golden-set venue through the classifier and reports precision and recall per tag.
 
 Create **`evals/run_eval.py`**:
 
@@ -2736,7 +2895,7 @@ json.dump(result, open(out_dir / "latest.json", "w"), indent=1)
 print(f"saved results/eval-{stamp}.json (and results/latest.json)")
 ```
 
-Fails CI if accuracy regresses beyond tolerance:
+Compares the latest evaluation to a stored baseline and fails if accuracy regresses beyond tolerance.
 
 Create **`evals/check_gate.py`**:
 
@@ -2774,7 +2933,7 @@ if failures:
 print("GATE PASSED")
 ```
 
-The CI workflow that runs the evaluation on gateway changes:
+The pipeline that runs the evaluation automatically whenever the classifier changes.
 
 Create **`.github/workflows/eval.yml`**:
 
@@ -2824,11 +2983,11 @@ jobs:
         run: python3 evals/check_gate.py
 ```
 
-> After the first successful run, copy the result into `evals/baseline.json` with `micro_precision`, `micro_recall`, `prompt_version` and `n` fields.
+After the first successful evaluation, save its scores to `evals/baseline.json` as the baseline the gate compares against.
 
 ## The governance runtime and agents
 
-The shared governance runtime: capability manifest, budgets, loop detection, dry-run and tracing. Both agents import it:
+The shared governance runtime enforcing the manifest, budgets, loop detection, dry-run and tracing. Both agents import it.
 
 Create **`apps/agents/governance.py`**:
 
@@ -2933,7 +3092,7 @@ class Governor:
         }
 ```
 
-The enrichment agent's capability manifest:
+The enrichment agent's capability manifest and budgets.
 
 Create **`apps/agents/enrichment/manifest.json`**:
 
@@ -2954,7 +3113,7 @@ Create **`apps/agents/enrichment/manifest.json`**:
 }
 ```
 
-The enrichment agent workflow:
+The enrichment agent: it looks up a venue, classifies it through the gateway, and either writes the result or sends a low-confidence result to a human review queue.
 
 Create **`apps/agents/enrichment/agent.py`**:
 
@@ -3075,7 +3234,7 @@ if __name__ == "__main__":
     main()
 ```
 
-A script that proves each governance control refuses what it must:
+A script that deliberately breaks the rules to prove each control refuses what it must.
 
 Create **`apps/agents/enrichment/demo_violations.py`**:
 
@@ -3117,7 +3276,7 @@ g3.call("classify", venue_id="x", description="same")
 expect_violation("loop detection", lambda: g3.call("classify", venue_id="x", description="same"))
 ```
 
-The operations agent's capability manifest:
+The operations agent's manifest.
 
 Create **`apps/agents/ops/manifest.json`**:
 
@@ -3137,7 +3296,7 @@ Create **`apps/agents/ops/manifest.json`**:
 }
 ```
 
-The operations agent: read-only triage that opens a pull request:
+The operations agent: it inspects the cluster read-only, retrieves a runbook, asks the gateway for a diagnosis, and opens a pull request. It cannot change anything.
 
 Create **`apps/agents/ops/agent.py`**:
 
@@ -3288,7 +3447,7 @@ if __name__ == "__main__":
     main()
 ```
 
-The operations agent's read-only Kubernetes identity (get/list/watch only):
+The operations agent's read-only cluster identity, with no write permissions anywhere.
 
 Create **`platform/k8s/tenancy/ops-agent.yaml`**:
 
@@ -3339,7 +3498,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-A runbook the ops agent retrieves during triage:
+A runbook — a documented response procedure — that the operations agent retrieves during triage.
 
 Create **`runbooks/KubePodNotReady.md`**:
 
@@ -3367,20 +3526,37 @@ rather than editing live. Page a human if user-facing traffic is failing;
 the ops agent must only propose changes by pull request.
 ```
 
-Prove the governance controls:
-
-```bash
-python3 apps/agents/enrichment/demo_violations.py   # each violation refused
-python3 apps/agents/enrichment/agent.py --venue <id> --dry-run  # no side effects
-```
-
-**Check:** The eval gate blocks a regressing prompt; an undeclared tool, a budget breach and a loop are each refused; the ops agent opens a correct pull request without any write access to the cluster.
+**Check:** The gate blocks a regressing prompt; an undeclared tool, a budget breach and a loop are each refused; the operations agent opens a correct pull request without any ability to change the cluster.
 
 ---
 
-# Phase 3 — Cloud infrastructure and GitOps *(requires your own AWS account and domain)*
+# Phase 3 — Cloud infrastructure and GitOps
 
-This phase provisions a real node and makes the cluster reconcile itself from Git. The files below are created once; applying them needs your AWS credentials and a domain you control.
+This phase moves the platform onto a real machine on the internet and makes it deploy itself from the repository. It requires an AWS account, a domain, and a provider key of your own.
+
+## Cloud computing and AWS
+
+Cloud computing means renting computers and services in a provider's data centre rather than owning hardware. Amazon Web Services (AWS) is the largest provider. This project rents a virtual machine, a fixed public address, a DNS service, storage for backups, and a store for secrets.
+
+## Infrastructure as code
+
+Infrastructure as code defines cloud resources in text files applied by a tool, rather than by clicking in a console. The definition lives in version control, can be reviewed, and can be rebuilt from scratch. Re-running the tool and seeing "no changes" proves the real infrastructure matches the definition, a state called no drift. This project uses OpenTofu, a free version of Terraform.
+
+## DNS, TLS and certificates
+
+DNS is the internet's directory, translating a name such as `platform.waypear.com` into a numeric address. TLS is the encryption behind the padlock in a browser, and a certificate proves a site is who it claims to be. Certificates are issued and renewed automatically by a certificate manager, at no cost, from Let's Encrypt.
+
+## Continuous integration
+
+Continuous integration is an automated pipeline that runs on every change: it tests the code, and on success builds and publishes the container images. Later phases add scanning, signing and an ingredient list to this pipeline.
+
+## GitOps and image pinning
+
+GitOps makes the repository the single source of truth for what should be running, with a program in the cluster continuously reconciling the live system to match it. Deployments become commits with a full history, and recovery is a matter of pointing the reconciler back at the repository. Production images are pinned by exact commit identifier, so what is running is precisely known. Argo CD is the reconciler used here.
+
+## The infrastructure definitions
+
+Declares that the AWS provider is used.
 
 Create **`infra/terraform/providers.tf`**:
 
@@ -3402,7 +3578,7 @@ provider "aws" {
 }
 ```
 
-Variables, including your admin IP and SSH key:
+The inputs: the region, the domain, and your admin address and SSH key.
 
 Create **`infra/terraform/variables.tf`**:
 
@@ -3434,7 +3610,7 @@ variable "ssh_public_key" {
 }
 ```
 
-The node, elastic IP, DNS zone, wildcard record and backup bucket:
+The resources: the virtual machine, its fixed address, the DNS zone and records, and the backup storage.
 
 Create **`infra/terraform/main.tf`**:
 
@@ -3535,6 +3711,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "backups" {
 }
 ```
 
+The values printed after applying, including the four nameservers to set at your registrar.
+
 Create **`infra/terraform/outputs.tf`**:
 
 ```hcl
@@ -3556,7 +3734,7 @@ output "backup_bucket" {
 }
 ```
 
-First-boot script installing k3s with a valid API cert:
+The script the machine runs on first boot to install the lightweight Kubernetes (k3s) with a certificate valid for remote access.
 
 Create **`infra/terraform/user_data.sh`**:
 
@@ -3581,17 +3759,17 @@ EOF
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--disable traefik" sh -
 ```
 
-Provision, delegate DNS, and confirm zero drift:
 
 ```bash
 cd infra/terraform && tofu init && tofu plan -out=tfplan
 tofu apply tfplan
 # set the four output nameservers at your domain registrar
-tofu plan   # expect: No changes (zero drift)
+tofu plan   # expect: No changes
 ```
 
-Then install Argo CD, register the repository with a read-only deploy key, and apply the single root application. The GitOps content:
-The app-of-apps root — the only manifest applied by hand:
+## The GitOps definitions
+
+The single application applied by hand; it defines all the others, so the whole platform bootstraps from one file.
 
 Create **`platform/argocd/root.yaml`**:
 
@@ -3617,6 +3795,8 @@ spec:
       prune: true
       selfHeal: true
 ```
+
+Tells Argo CD to keep the namespaces, quotas and roles in sync automatically.
 
 Create **`platform/argocd/apps/tenancy.yaml`**:
 
@@ -3644,7 +3824,7 @@ spec:
       selfHeal: true
 ```
 
-Production workloads sit behind a manual sync gate:
+The production workloads, which require a deliberate manual sync to change.
 
 Create **`platform/argocd/apps/workloads-prod.yaml`**:
 
@@ -3669,6 +3849,8 @@ spec:
     syncOptions:
       - PruneLast=true
 ```
+
+The ingress controller that receives outside traffic.
 
 Create **`platform/argocd/apps/ingress-nginx.yaml`**:
 
@@ -3701,6 +3883,8 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ```
+
+The certificate manager that issues TLS certificates.
 
 Create **`platform/argocd/apps/cert-manager.yaml`**:
 
@@ -3772,7 +3956,7 @@ spec:
         factor: 2
 ```
 
-The Let's Encrypt issuer:
+Configures automatic certificates from Let's Encrypt.
 
 Create **`platform/k8s/edge/cluster-issuer.yaml`**:
 
@@ -3793,7 +3977,7 @@ spec:
             ingressClassName: nginx
 ```
 
-The ingress for your domain with automatic TLS:
+Routes the domain to the API and requests a certificate for it.
 
 Create **`platform/k8s/edge/api-ingress.yaml`**:
 
@@ -3823,6 +4007,8 @@ spec:
                 port:
                   number: 80
 ```
+
+Opens exactly the paths the edge needs through the default-deny policy.
 
 Create **`platform/k8s/edge/netpol-edge.yaml`**:
 
@@ -3865,7 +4051,7 @@ spec:
         - port: 8089
 ```
 
-The CI pipeline: test, build, push, scan, SBOM and sign (signing details in Phase 8):
+The pipeline: test, then build, push, scan, generate an ingredient list, and sign the images (scanning and signing are explained in Phase 8).
 
 Create **`.github/workflows/ci.yml`**:
 
@@ -3956,13 +4142,25 @@ jobs:
       - run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.OWNER }}/tamani-${{ matrix.app }}@${{ steps.build.outputs.digest }}
 ```
 
-**Check:** `tofu plan` reports no changes; Argo CD shows applications Synced and Healthy; your domain serves over HTTPS.
+**Check:** `tofu plan` reports no changes; Argo CD shows the applications synced and healthy; the domain serves over HTTPS.
 
 ---
 
-# Phase 7 — Observability and SLOs *(cloud)*
+# Phase 7 — Observability and service level objectives
 
-kube-prometheus-stack via GitOps, trimmed for a small node:
+This phase adds the ability to see the system's health and to define what healthy means.
+
+## Observability
+
+Observability is the ability to understand a system's internal state from its outputs. Three kinds of signal support it: metrics (numbers over time, such as requests per second), logs (records of events) and traces (the path of one request across services).
+
+## Service level objectives and error budgets
+
+A service level indicator is a measured ratio of good events to valid events. A service level objective is a target for it, such as 99.5% of requests succeeding over a month. The error budget is the small amount of failure the objective allows. The burn rate is how fast that budget is being spent; alerting on burn rate — a fast burn paging immediately, a slow burn raising a ticket — removes most alert noise.
+
+## The monitoring definitions
+
+Installs Prometheus, Grafana and the alerting components, sized for a small node.
 
 Create **`platform/argocd/apps/monitoring.yaml`**:
 
@@ -4026,6 +4224,8 @@ spec:
     automated: { prune: true, selfHeal: true }
     syncOptions: [CreateNamespace=true, ServerSideApply=true]
 ```
+
+Installs Loki, which stores logs for searching.
 
 Create **`platform/argocd/apps/loki.yaml`**:
 
@@ -4093,7 +4293,7 @@ spec:
       backoff: { duration: 30s, factor: 2 }
 ```
 
-Tell Prometheus to scrape the services:
+Tells Prometheus to collect metrics from the API and gateway.
 
 Create **`platform/k8s/slo/servicemonitors.yaml`**:
 
@@ -4125,7 +4325,7 @@ spec:
       interval: 30s
 ```
 
-Allow the monitoring namespace through default-deny:
+Allows the monitoring namespace through the default-deny policy so it can collect metrics.
 
 Create **`platform/k8s/slo/netpol-monitoring.yaml`**:
 
@@ -4150,7 +4350,7 @@ spec:
         - port: 8001
 ```
 
-Recording rules and multi-window burn-rate alerts:
+Defines the objectives and the burn-rate alerts.
 
 Create **`platform/k8s/slo/slo-rules.yaml`**:
 
@@ -4219,7 +4419,7 @@ spec:
             runbook: runbooks/TamaniLatencySLOBreach.md
 ```
 
-The service-health and spend dashboards:
+The service-health and spend dashboards.
 
 Create **`platform/k8s/slo/dashboards.yaml`**:
 
@@ -4794,15 +4994,33 @@ dependency call on the hot path, node swap pressure.
 otherwise treat as a regression and bisect recent promotions.
 ```
 
-**Check:** Prometheus lists the tamani targets as up; the SLO rules return values; the Grafana dashboards render availability, latency and spend.
+**Check:** Prometheus lists the services as reachable; the objective rules return values; the dashboards show availability, latency and spend.
 
 ---
 
-# Phase 8 — Security and supply chain *(cloud)*
+# Phase 8 — Security and supply chain
 
-The CI pipeline created in Phase 3 already signs, scans and generates SBOMs. This phase enforces signatures at admission and moves the secret out of the cluster.
+This phase ensures only trusted, scanned, signed software runs, and that secrets never sit in the repository or in a human's command history.
 
-Kyverno on the cloud cluster plus the policies application:
+## Supply chain security
+
+The software supply chain is everything that goes into a running image. Securing it means proving where each image came from and what it contains, and refusing anything untrusted.
+
+## Image signing
+
+Image signing attaches a verifiable signature to an image, proving its origin. Keyless signing ties the signature to the identity of the pipeline that built it, rather than to a stored key that could leak. The cluster verifies the signature before allowing an image to run and refuses unsigned ones.
+
+## Vulnerability scanning and SBOMs
+
+A vulnerability scan checks an image against a database of known security flaws, and the pipeline fails on serious fixable ones. A software bill of materials (SBOM) is a list of everything inside an image, produced for every build, so its contents can be audited.
+
+## Secret management
+
+A secret is a sensitive value such as an API key. Secrets must not live in the repository. Instead they live in a managed store, and an operator syncs them into the cluster using an identity that can only read them. Rotation becomes updating the store; the change propagates on its own.
+
+## The security definitions
+
+Installs the admission controller on the cloud cluster and applies the policies.
 
 Create **`platform/argocd/apps/kyverno.yaml`**:
 
@@ -4862,7 +5080,7 @@ spec:
       backoff: { duration: 30s, factor: 2 }
 ```
 
-Require a valid keyless CI signature for images from your registry:
+Requires a valid signature from this project's pipeline for images from its registry; unsigned images are refused.
 
 Create **`platform/policies/verify-images.yaml`**:
 
@@ -4901,7 +5119,7 @@ spec:
                       url: https://rekor.sigstore.dev
 ```
 
-A read-only IAM identity for External Secrets Operator:
+A cloud identity for the secrets operator, able only to read the project's secret path.
 
 Create **`infra/terraform/eso.tf`**:
 
@@ -4941,6 +5159,8 @@ output "eso_secret_access_key" {
   sensitive = true
 }
 ```
+
+Installs the operator that syncs secrets into the cluster.
 
 Create **`platform/argocd/apps/external-secrets.yaml`**:
 
@@ -4996,7 +5216,7 @@ spec:
       backoff: { duration: 30s, factor: 2 }
 ```
 
-The secret store and ExternalSecret; the key lives in AWS Parameter Store:
+Defines where the provider key lives in the cloud secret store and how it is synced into the cluster hourly.
 
 Create **`platform/k8s/secrets/anthropic.yaml`**:
 
@@ -5043,20 +5263,37 @@ spec:
         key: /tamani/anthropic-api-key
 ```
 
-Put the key in Parameter Store (out of band, never in Git):
+Place the key in the cloud secret store, out of band, never in the repository.
+
 
 ```bash
 aws ssm put-parameter --name /tamani/anthropic-api-key \
   --type SecureString --value "$YOUR_KEY" --overwrite
 ```
 
-**Check:** An unsigned image is refused at admission; a signed image is admitted; the cluster secret's content matches Parameter Store.
+**Check:** An unsigned image is refused at admission; a signed image is admitted; the cluster secret matches the value in the store.
 
 ---
 
-# Phase 9 — Reliability proof *(cloud)*
+# Phase 9 — Reliability proof
 
-A k6 load profile mixing searches and feed reads:
+This phase measures the platform's limits and confirms its failure behaviour, recording the evidence.
+
+## Load testing, saturation and limiting resources
+
+A load test drives controlled traffic to measure capacity and response time. The saturation point is the load at which a resource is exhausted; the limiting resource is the one that runs out first. Knowing both replaces guessing at capacity.
+
+## Chaos engineering
+
+Chaos engineering deliberately injects a fault — killing a pod, adding delay — with a written prediction of the outcome, then records the result against the prediction. It reveals whether the system's safety mechanisms actually work.
+
+## Postmortems, runbooks and disruption budgets
+
+A postmortem is a blameless write-up of an incident focused on why the system permitted the failure, not who caused it. A runbook is a documented response for an alert. A pod disruption budget guarantees a minimum number of copies survive a voluntary disruption, so planned events do not cause an outage.
+
+## The load profile
+
+The load-test script, mixing searches and feed reads and raising the number of simulated users in stages.
 
 Create **`tools/load/api-load.js`**:
 
@@ -5096,23 +5333,34 @@ export default function () {
 }
 ```
 
-Load-test until a resource saturates; record the point and limiting resource:
+Run the load test, raising it until a resource saturates, and record the saturation point and limiting resource. (`k6` is the load-testing tool.)
+
 
 ```bash
 BASE_URL=https://<your-domain> VUS_LOW=5 VUS_HIGH=30 k6 run tools/load/api-load.js
 ```
 
-Then, under light load, kill an API replica (expect zero errors) and the single-replica gateway (time the outage and recovery). Record each experiment with its hypothesis in `runbooks/chaos/`, and any incident in `runbooks/postmortems/`.
+Then, under light load, kill an API pod (expecting no user-visible errors) and the single gateway (timing the outage and automatic recovery), recording each experiment's prediction and result in `runbooks/chaos/`, and any incident in `runbooks/postmortems/`.
 
-**Check:** The load test names the saturation point and limiting resource; the API pod kill causes no errors; the gateway kill recovers on its own; results are written up.
+**Check:** The load test names the saturation point and limiting resource; the API pod kill causes no errors; the gateway kill recovers on its own; the results are written up.
 
 ---
 
 # Phase 10 — Developer self-service
 
-One command scaffolds a fully operable, signed service.
+This phase provides a single command that creates a complete, operable service, which is what makes the whole system an internal developer platform.
 
-The platform CLI:
+## Internal developer platforms and golden paths
+
+An internal developer platform lets developers create and run services without needing to understand the cluster's internals. A golden path is the supported, standard way to build a service. Because the standard way supplies operability by default, a service built on it cannot ship without health checks, monitoring, security and a runbook.
+
+## Scaffolding and templates
+
+Scaffolding generates a complete service from a template — a parameterised set of source files. The generated output includes the hardened container, probes, metrics, network policy, monitoring, a signed pipeline, a deployment definition and a runbook, so correctness is the default rather than extra work.
+
+## The CLI and templates
+
+The platform command-line tool. `tamani new <name>` scaffolds a service; other commands list and remove services.
 
 Create **`cli/tamani`**:
 
@@ -5245,7 +5493,7 @@ if __name__ == "__main__":
     main()
 ```
 
-The templates it renders:
+The templates it fills in:
 Create **`cli/templates/main.py.tpl`**:
 
 ```text
@@ -5570,7 +5818,6 @@ port: __PORT__
 dependencies: []
 ```
 
-Scaffold a service; CI signs it and Argo CD deploys it:
 
 ```bash
 chmod +x cli/tamani
@@ -5578,13 +5825,25 @@ chmod +x cli/tamani
 git add -A && git commit -m 'scaffold example-api' && git push
 ```
 
-**Check:** The scaffolded service reaches live traffic with no manual cluster command, admitted through the same signature policy as every workload.
+**Check:** The scaffolded service reaches live traffic with no manual cluster command, admitted through the same signature policy as every other workload.
 
 ---
 
 # Phase 11 — Cost and unit economics
 
-Runs the golden set through each candidate model to measure accuracy and cost per model:
+This phase puts a measured money figure on the system, focusing on the cost that dominates an AI product.
+
+## Unit economics and cost attribution
+
+Unit economics express cost per unit of value, such as per thousand classifications. Cost attribution assigns spending to namespaces, workloads or purposes. For an AI product, inference spending dominates compute, so it is the primary line to measure.
+
+## Model tiering and the self-hosting crossover
+
+Model tiering routes easy work to a cheaper model and hard work to an expensive one, with the accuracy cost measured rather than assumed. The self-hosting crossover is the volume at which running one's own model becomes cheaper than a managed provider, found by comparing per-token pricing against a machine's hourly cost and throughput.
+
+## The experiment
+
+Runs the golden set through each candidate model and reports accuracy and cost per model, so the accuracy cost of tiering is measured.
 
 Create **`evals/tiering_experiment.py`**:
 
@@ -5660,19 +5919,18 @@ json.dump(results, open(ROOT / "tiering_results.json", "w"), indent=1)
 print("\n" + json.dumps(results, indent=1))
 ```
 
-Measure the accuracy cost of cheaper models (run where the SDK is available):
 
 ```bash
 python3 evals/tiering_experiment.py
 ```
 
-Read cost per thousand classifications from the gateway's `/v1/costs` endpoint, compute the self-hosting crossover from per-token pricing against a GPU's hourly cost and throughput, and record the figures with their methods.
+Read the cost per thousand classifications from the gateway's `/v1/costs` endpoint, compute the self-hosting crossover, and record the figures with their methods.
 
-**Check:** Cost per thousand classifications is known; the tiering table shows accuracy and cost per model; the self-hosting crossover is computed.
+**Check:** Cost per thousand classifications is known; the tiering table shows accuracy and cost per model; the self-hosting crossover is computed and compared to the real workload volume.
 
 ---
 
 # Completion
 
-The build is complete when the site serves over HTTPS from your cluster, deployed only through Git; the evaluation gate guards accuracy; unsigned images are refused; the secret lives in a managed store; and the reliability, cost and self-service evidence is recorded.
+The platform is complete when the site serves over HTTPS from the cluster, deployed only through the repository; the evaluation gate guards accuracy; unsigned images are refused; the secret lives in a managed store; and the reliability, cost and self-service evidence is recorded. Every concept above has a definition and a purpose, and every file has its full contents and the reason it exists.
 

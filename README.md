@@ -23,11 +23,10 @@ All twelve phases complete; every headline number is measured, not claimed.
 | 11. Cost & unit economics | done | tiering experiment, crossover, $/1k published |
 
 Documentation:
-- **`docs/build-from-scratch.md`** — the complete self-contained build manual: every
-  file's full contents inline, in order, with the command and check for each step.
-- **`docs/walkthrough.md`** — a tour of the finished platform.
-- **`docs/study-reference.md`** — the underlying concepts, subject by subject.
-- **`docs/build-guide.md`** — the condensed step order (points at repo files).
+- **`docs/complete-guide.md`** — the full guide: every concept explained for a
+  beginner, then the platform built from an empty directory with every file's full
+  contents and the reason for each. Start here.
+- **`docs/walkthrough.md`** — a short tour of the finished platform.
 
 Evidence: `docs/unit-economics.md`, `runbooks/postmortems/`,
 `runbooks/chaos/`, `runbooks/golden-path.md`, `docs/adr/`.
