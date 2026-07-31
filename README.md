@@ -5,7 +5,7 @@ production-grade internal platform on Kubernetes, delivered by GitOps, with a
 governed inference gateway and agentic workloads under evaluation gates.
 
 Live at **https://platform.waypear.com**. Full plan and evidence in `docs/`.
-All twelve phases complete; every headline number is measured, not claimed.
+
 
 | Phase | Status | Evidence |
 |---|---|---|
