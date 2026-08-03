@@ -17,7 +17,7 @@ import anthropic
 
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent / "apps" / "gateway"))
-import provider  # noqa: E402 — reuse the schema, prompt and pricing
+import provider  # noqa: E402, reuse the schema, prompt and pricing
 
 MODELS = ["claude-haiku-4-5", "claude-sonnet-5", "claude-opus-4-8"]
 golden = [json.loads(l) for l in open(ROOT / "golden_set.jsonl") if l.strip()]

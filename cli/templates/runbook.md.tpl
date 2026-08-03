@@ -3,7 +3,7 @@
 **Owner:** __OWNER__
 **Scaffolded:** __DATE__ (golden path __GOLDEN_VERSION__)
 
-**What it does:** <one sentence — fill this in before first incident>
+**What it does:** <one sentence, fill this in before first incident>
 
 **First three checks:**
 1. `kubectl -n tamani-dev get pods -l app=__NAME__`

@@ -61,7 +61,7 @@ spec:
   ports: [{ port: 80, targetPort: 8001 }]
 ---
 # Only the worker may call the gateway. Egress: redis, plus HTTPS out to
-# the LLM provider — the single external call path the platform allows,
+# the LLM provider, the single external call path the platform allows,
 # and only from this one workload.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

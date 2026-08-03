@@ -1,4 +1,4 @@
-"""reviews-api — scaffolded by the tamani golden path (gp-1.0.0).
+"""reviews-api, scaffolded by the tamani golden path (gp-1.0.0).
 
 Ships on day one with: split health probes, JSON logs with correlation
 ids, Prometheus metrics, hardening, network policy, monitoring, alerts,

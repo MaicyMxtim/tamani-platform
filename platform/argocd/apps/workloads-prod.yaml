@@ -1,5 +1,5 @@
 # Production workloads: NO automated sync. Promotion is a deliberate
-# act — a human syncs after reviewing what would change.
+# act, a human syncs after reviewing what would change.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:

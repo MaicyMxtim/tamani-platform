@@ -1,6 +1,6 @@
 # Two personas per the plan:
-#   developer — read pods and logs in one namespace, nothing destructive
-#   deployer  — update workloads and nothing else
+#   developer, read pods and logs in one namespace, nothing destructive
+#   deployer , update workloads and nothing else
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

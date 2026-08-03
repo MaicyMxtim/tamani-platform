@@ -1,4 +1,4 @@
-# The operations agent's identity: get, list, watch — and no write verb
+# The operations agent's identity: get, list, watch, and no write verb
 # anywhere. Least privilege at the infrastructure boundary, not just the
 # application one.
 apiVersion: v1

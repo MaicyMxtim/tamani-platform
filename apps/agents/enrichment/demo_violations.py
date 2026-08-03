@@ -13,9 +13,9 @@ noop["delete_everything"] = (lambda **kw: {}, True)
 def expect_violation(label, fn):
     try:
         fn()
-        print(f"{label}: FAILED — call was allowed")
+        print(f"{label}: FAILED, call was allowed")
     except GovernanceViolation as exc:
-        print(f"{label}: REFUSED — {exc}")
+        print(f"{label}: REFUSED, {exc}")
 
 
 g1 = Governor(MANIFEST, noop)

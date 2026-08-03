@@ -4,8 +4,8 @@
 monthly error budget per hour. Users are seeing errors right now.
 
 **First three checks:**
-1. Grafana "Tamani — Service Health": which status codes are rising?
-2. `kubectl -n tamani-prod get pods` — restarts or not-ready pods?
+1. Grafana "Tamani. Service Health": which status codes are rising?
+2. `kubectl -n tamani-prod get pods`. Restarts or not-ready pods?
 3. Loki: filter `{namespace="tamani-prod"}` for level=ERROR around onset.
 
 **Common causes:** a bad deploy (check Argo CD history, roll back by

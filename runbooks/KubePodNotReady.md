@@ -4,11 +4,11 @@
 CrashLoopBackOff, Error) for longer than the alert window.
 
 **First three checks:**
-1. `kubectl -n <ns> get pods` — which pod, which state, how many restarts.
-2. `kubectl -n <ns> describe pod <pod>` — read Events at the bottom:
+1. `kubectl -n <ns> get pods`. Which pod, which state, how many restarts.
+2. `kubectl -n <ns> describe pod <pod>`. Read Events at the bottom:
    image pull errors name the bad reference; scheduling failures name the
    unsatisfiable constraint; OOMKilled appears in last state.
-3. `kubectl -n <ns> logs <pod> --previous` — the crash reason if the
+3. `kubectl -n <ns> logs <pod> --previous`. The crash reason if the
    container starts and dies.
 
 **Common causes:** a typo'd or unpushed image tag (ImagePullBackOff), a

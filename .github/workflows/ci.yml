@@ -63,7 +63,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       # Fail the build on fixable critical vulnerabilities. Exceptions go
-      # in .trivyignore with an expiry comment — explicit and time-limited.
+      # in .trivyignore with an expiry comment, explicit and time-limited.
       - name: trivy vulnerability scan
         uses: aquasecurity/trivy-action@master
         with:

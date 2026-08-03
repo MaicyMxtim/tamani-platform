@@ -1,4 +1,4 @@
-# Default deny for ingress and egress, then DNS opened explicitly —
+# Default deny for ingress and egress, then DNS opened explicitly , 
 # without the kube-dns rule, every name lookup in the namespace fails.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
