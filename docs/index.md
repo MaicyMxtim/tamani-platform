@@ -1,25 +1,49 @@
 # Tamani Platform
 
-A production-grade internal platform running a venue-discovery backend on Kubernetes, delivered entirely by GitOps, with a governed AI inference gateway, autonomous agents kept safe by a governance layer, full observability, a secure supply chain, reliability evidence, a developer self-service tool, and published unit economics.
+A production platform running a venue discovery backend on Kubernetes. It serves a public API, routes every AI call through a governed gateway, runs two autonomous agents inside a safety layer, and enforces a signed supply chain. It is deployed on a cloud server and reachable on the internet.
 
 ## Live
 
-- **Platform:** [platform.waypear.com](https://platform.waypear.com/)
-- **Interactive API explorer:** [platform.waypear.com/docs](https://platform.waypear.com/docs)
-- **Source:** [github.com/MaicyMxtim/tamani-platform](https://github.com/MaicyMxtim/tamani-platform)
+| What | Where |
+|---|---|
+| Platform | [platform.waypear.com](https://platform.waypear.com/) |
+| API explorer | [platform.waypear.com/docs](https://platform.waypear.com/docs) |
+| Source | [github.com/MaicyMxtim/tamani-platform](https://github.com/MaicyMxtim/tamani-platform) |
 
-## Read
+## Contents
 
-- **[Walkthrough](walkthrough.html)**. a tour of the finished platform: architecture, components and measured results.
-- **[Complete Guide](complete-guide.html)**. every concept explained for a beginner, then the platform built from an empty directory with every file and the reason for each.
-- **[Unit economics](unit-economics.html)**. the measured cost figures and their methods.
+1. [Walkthrough](walkthrough.html). A tour of the finished platform: architecture, components and results.
+2. [Complete Guide](complete-guide.html). Every concept explained from the beginning, then the platform built from an empty directory with the reason for each file.
+3. [Costs](unit-economics.html). The measured cost figures and how they were arrived at.
 
-## Measured results
+## Stack
 
-- Availability 100% and p95 latency 95 ms against the service level objectives in the measured window.
-- Cost per thousand classifications: about $4.01 after caching.
-- Model tiering projected to cut blended cost by about 57% for a small, measured accuracy loss.
-- Golden-set accuracy: 80.3% precision, 68.0% recall, enforced as a CI regression gate.
-- Time from a single scaffold command to a service serving live traffic: 195 seconds.
-- Saturation point around 25 to 30 concurrent users, limited by node memory.
+| Layer | Tool |
+|---|---|
+| Cloud | AWS EC2, Route53, S3 |
+| Infrastructure as code | OpenTofu |
+| Cluster | k3s |
+| Deployment | Argo CD |
+| Edge | ingress-nginx, cert-manager |
+| Services | FastAPI |
+| Messaging | NATS JetStream |
+| Data | Redis |
+| AI gateway | Anthropic API, semantic cache |
+| Monitoring | Prometheus, Grafana, Loki |
+| Supply chain | cosign, trivy, syft, gitleaks, Kyverno |
+| Secrets | External Secrets Operator, AWS SSM |
 
+## Results
+
+| Measure | Value |
+|---|---|
+| Availability in the measured window | 100% |
+| p95 latency | 95 ms |
+| Cost per thousand classifications | about $4.01 after caching |
+| Saving projected from model tiering | about 57% |
+| Classification precision | 80.3% |
+| Classification recall | 68.0% |
+| Scaffold command to live traffic | 195 seconds |
+| Saturation point | 25 to 30 concurrent users |
+
+Classification accuracy is enforced in CI as a regression gate, so a change that makes the model worse fails the build. The saturation point is limited by memory on a single small node.
