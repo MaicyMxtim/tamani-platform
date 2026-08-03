@@ -3,7 +3,7 @@
 **Owner:** maicy
 **Scaffolded:** 2026-07-23 (golden path gp-1.0.0)
 
-**What it does:** <one sentence — fill this in before first incident>
+**What it does:** <one sentence, fill this in before first incident>
 
 **First three checks:**
 1. `kubectl -n tamani-dev get pods -l app=reviews-api`

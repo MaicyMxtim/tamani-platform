@@ -1,4 +1,4 @@
-"""__NAME__ — scaffolded by the tamani golden path (__GOLDEN_VERSION__).
+"""__NAME__, scaffolded by the tamani golden path (__GOLDEN_VERSION__).
 
 Ships on day one with: split health probes, JSON logs with correlation
 ids, Prometheus metrics, hardening, network policy, monitoring, alerts,

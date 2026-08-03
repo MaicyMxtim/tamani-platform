@@ -2,7 +2,7 @@
 
 `tamani new <name>` scaffolds a service that is operable on the day it is
 created. Measured once (reviews-api, 2026-07-23): **195 seconds from the
-scaffold command to the service answering traffic in dev** — 161s of that
+scaffold command to the service answering traffic in dev**, 161s of that
 was CI building, scanning, generating an SBOM and signing the image; the
 rest was Argo CD reconciling and the pod passing its probes. No cluster
 commands were run by hand.
@@ -24,4 +24,4 @@ Correctness by default: a developer on the golden path cannot ship a
 service without probes, telemetry, policy, a signed supply chain and a
 runbook, because the template supplies them. The image is signed by the
 generated CI and admitted only because it passes the cluster's signature
-policy — the same gate that protects every other workload.
+policy, the same gate that protects every other workload.

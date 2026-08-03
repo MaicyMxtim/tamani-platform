@@ -1,4 +1,4 @@
-# Two dashboards, loaded by Grafana's sidecar. Generated JSON —
+# Two dashboards, loaded by Grafana's sidecar. Generated JSON , 
 # regenerate via the script in git history if editing.
 apiVersion: v1
 kind: ConfigMap

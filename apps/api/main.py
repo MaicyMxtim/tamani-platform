@@ -1,5 +1,5 @@
 """
-Tamani API — venue search, filtering and the public feed.
+Tamani API, venue search, filtering and the public feed.
 
 Phase 1 standard: split health probes, structured JSON logging with a
 correlation id propagated across service boundaries, Prometheus metrics.

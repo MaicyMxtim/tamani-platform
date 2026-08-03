@@ -1,1 +1,1 @@
-# cli — populated in later phases per docs/. See project plan.
+# cli, populated in later phases per docs/. See project plan.

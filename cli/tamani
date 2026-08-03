@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""tamani — the platform CLI.
+"""tamani, the platform CLI.
 
     tamani new <name> [--port 8000] [--owner you]   scaffold a service
     tamani catalogue                                 list every service
@@ -62,7 +62,7 @@ def new(args):
         path.write_text(render(tpl, ctx))
         print(f"  wrote {dest}")
     print(f"\n{name} scaffolded on golden path {GOLDEN_VERSION}.")
-    print("next: git add -A && git commit && git push — Argo deploys it to dev.")
+    print("next: git add -A && git commit && git push. Argo deploys it to dev.")
 
 
 def catalogue(_args):

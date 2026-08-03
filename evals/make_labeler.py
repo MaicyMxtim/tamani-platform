@@ -1,4 +1,4 @@
-"""Generate tools/labeler.html — the golden-set labelling page.
+"""Generate tools/labeler.html, the golden-set labelling page.
 
 Samples venues, embeds them with their current tags preselected (you
 correct rather than start from scratch), and produces a single HTML file
@@ -92,7 +92,7 @@ kbd { background:var(--card); padding:1px 5px; border-radius:4px; border:1px sol
       <button class="primary" onclick="move(1)">Save &amp; next &rarr;</button>
     </div>
     <div class="footer">
-      <span>Keys: <kbd>1</kbd>–<kbd>0</kbd> toggle · <kbd>&crarr;</kbd> next</span>
+      <span>Keys: <kbd>1</kbd> to <kbd>0</kbd> toggle · <kbd>&crarr;</kbd> next</span>
       <button onclick="exportSet()">Export golden_set.json</button>
     </div>
   </div>
@@ -116,7 +116,7 @@ function render() {
     v.meta + (v.maps ? ' · <a href="' + v.maps + '" target="_blank">map</a>' : "");
   const done = Object.keys(labels).length;
   document.getElementById("count").textContent =
-    "Venue " + (i+1) + " of " + ITEMS.length + " — " + done + " labelled";
+    "Venue " + (i+1) + " of " + ITEMS.length + ", " + done + " labelled";
   document.getElementById("bar").style.width = (100 * done / ITEMS.length) + "%";
   const box = document.getElementById("tags"); box.innerHTML = "";
   TAGS.forEach((t, n) => {

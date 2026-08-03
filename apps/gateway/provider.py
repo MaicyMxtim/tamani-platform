@@ -108,7 +108,7 @@ def classify_anthropic(description: str) -> dict:
         breaker.record_failure()
         raise
     except anthropic.APIStatusError:
-        # 4xx: our fault, not the provider's health — don't trip the breaker
+        # 4xx: our fault, not the provider's health, don't trip the breaker
         raise
 
     if response.stop_reason == "refusal":

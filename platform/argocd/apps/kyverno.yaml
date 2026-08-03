@@ -13,7 +13,7 @@ spec:
     targetRevision: 3.3.4
     helm:
       valuesObject:
-        # Admission control only on the small node — no background scans,
+        # Admission control only on the small node, no background scans,
         # no policy reports, single replica.
         admissionController:
           replicas: 1

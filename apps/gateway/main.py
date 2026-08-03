@@ -1,5 +1,5 @@
 """
-Tamani inference gateway — the only service that talks to an LLM provider.
+Tamani inference gateway, the only service that talks to an LLM provider.
 
 Request path: tenant auth -> token budget -> semantic cache -> provider
 (Anthropic primary, mock fallback behind a circuit breaker) -> cache store

@@ -1,7 +1,7 @@
 # Supply chain enforcement: any image from our registry entering a
 # tamani namespace must carry a valid keyless signature produced by this
 # repository's CI on main. An unsigned or tampered image is refused at
-# admission. Third-party images (redis, nats) are out of scope here —
+# admission. Third-party images (redis, nats) are out of scope here , 
 # they are pinned by tag and vetted by Renovate instead.
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy

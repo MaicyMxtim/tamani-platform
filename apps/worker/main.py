@@ -1,5 +1,5 @@
 """
-Tamani enrichment worker — consumes venue.enrichment.requested from NATS
+Tamani enrichment worker, consumes venue.enrichment.requested from NATS
 JetStream and calls the gateway to classify.
 
 Delivery semantics (Phase 4):
@@ -163,7 +163,7 @@ async def main():
     nc = await nats.connect(NATS_URL)
     js = nc.jetstream()
 
-    # Retention by age and size — an unbounded stream eventually fills
+    # Retention by age and size, an unbounded stream eventually fills
     # the volume. 7 days / 256 MiB holds far more than the workload needs.
     config = StreamConfig(
         name=STREAM,
