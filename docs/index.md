@@ -13,8 +13,7 @@ A production platform running a venue discovery backend on Kubernetes. It serves
 ## Contents
 
 1. [Walkthrough](walkthrough.html). A tour of the finished platform: architecture, components and results.
-2. [Complete Guide](complete-guide.html). Every concept explained from the beginning, then the platform built from an empty directory with the reason for each file.
-3. [Costs](unit-economics.html). The measured cost figures and how they were arrived at.
+2. [Costs](unit-economics.html). The measured cost figures and how they were arrived at.
 
 ## Stack
 
