@@ -23,10 +23,10 @@ Live at **https://platform.waypear.com**. Full plan and evidence in `docs/`.
 | 11. Cost & unit economics | done | tiering experiment, crossover, $/1k published |
 
 Documentation:
-- **`docs/complete-guide.md`** — the full guide: every concept explained for a
+- **`docs/complete-guide.md`**. the full guide: every concept explained for a
   beginner, then the platform built from an empty directory with every file's full
   contents and the reason for each. Start here.
-- **`docs/walkthrough.md`** — a short tour of the finished platform.
+- **`docs/walkthrough.md`**. a short tour of the finished platform.
 
 Evidence: `docs/unit-economics.md`, `runbooks/postmortems/`,
 `runbooks/chaos/`, `runbooks/golden-path.md`, `docs/adr/`.
