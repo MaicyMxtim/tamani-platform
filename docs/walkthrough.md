@@ -81,14 +81,5 @@ The `tamani` CLI scaffolds a complete, operable service from one command: a hard
 - Model tiering: routing by confidence is projected to cut blended cost by about 57% for a small, measured accuracy loss.
 - Golden-set accuracy: 80.3% precision, 68.0% recall, enforced as a CI regression gate.
 - Time from scaffold command to serving traffic: 195 seconds.
-- Saturation point: around 25–30 concurrent users, limited by node memory.
+- Saturation point: around 25 to 30 concurrent users, limited by node memory.
 
-## How it maps to roles
-
-- **Cloud Support / SRE**. the incident diagnosis, postmortems, SLOs and burn-rate alerting.
-- **DevOps / Platform Engineer**. GitOps delivery, admission policy, the golden path and self-service CLI.
-- **AI Platform Engineer**. the governed gateway economics and the evaluation gate blocking a regressing prompt.
-
----
-
-*The repository is the primary artifact; every figure above is measured and reproducible from it.*
