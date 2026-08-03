@@ -3,7 +3,7 @@
 Every figure here comes from the running system or a measured experiment,
 with the method stated. Inference is treated as the primary cost line,
 because for an AI-backed product it dominates compute long before
-Kubernetes does — the whole platform runs on one machine covered by
+Kubernetes does, the whole platform runs on one machine covered by
 free-tier credits, while a single day of classification can outspend it.
 
 ## Cost per thousand classifications
@@ -27,12 +27,12 @@ prompt is a recurring bill.
 
 The semantic cache avoided 136 provider calls in the measured window.
 At the effective blended rate that is the difference between $5.14 and
-$4.01 per thousand — a **22% reduction** already, rising with traffic as
+$4.01 per thousand, a **22% reduction** already, rising with traffic as
 popular venues repeat. On production traffic (many users, few new
 venues) the plan's expectation of the cache removing the majority of
 spend holds; ours is early and low-repeat.
 
-## Model tiering — accuracy cost measured, not assumed
+## Model tiering, accuracy cost measured, not assumed
 
 **Method:** the 144-venue golden set run through each model directly,
 cache bypassed (`evals/tiering_experiment.py`).
@@ -44,11 +44,11 @@ cache bypassed (`evals/tiering_experiment.py`).
 | Opus 4.8 | 80.9% | 68.6% | 74.2% | $4.10 |
 
 **The decision this data supports:** Opus buys **1.3 F1 points over
-Sonnet for 1.3x the cost** — thin. Haiku is **6.6x cheaper than Opus**
+Sonnet for 1.3x the cost**. thin. Haiku is **6.6x cheaper than Opus**
 and loses ~7.5 F1 points. So the economical routing is: **Haiku for the
 straightforward classifications, escalate to Opus only when Haiku's
 confidence is low.** If a third of venues escalate, blended cost is
-roughly `0.67*$0.62 + 0.33*$4.10 = $1.77/1k` — a **57% cut** versus
+roughly `0.67*$0.62 + 0.33*$4.10 = $1.77/1k`. a **57% cut** versus
 all-Opus, for a small, measured accuracy loss concentrated on the
 venues that were ambiguous anyway. The routing hook already exists (the
 gateway records confidence per classification); turning it on is a
@@ -64,11 +64,11 @@ of a self-hosted GPU that could serve an equivalent open model.
   ~$550–730/month if always on.
 - At ~350 input + 40 output tokens per classification, a single such GPU
   serving a 7–8B open model sustains on the order of a few classifications
-  per second — call it ~200k/day at healthy utilisation.
+  per second, call it ~200k/day at healthy utilisation.
 
 **Crossover:** self-hosting only wins when sustained volume fills the GPU.
 At $650/month, break-even against Opus at $4.10/1k is about **160,000
-classifications a month** — and against the *tiered* $1.77/1k blend it is
+classifications a month**. and against the *tiered* $1.77/1k blend it is
 about **370,000/month**. Tamani's real workload (1,275 venues,
 reclassified occasionally) is three orders of magnitude below that. **The
 managed provider is decisively cheaper here**, and self-hosting would
@@ -78,7 +78,7 @@ classification volume becomes continuous rather than bursty.
 
 ## Cost per active user and per search
 
-- **Search requests are free of inference cost** — they read the bundled
+- **Search requests are free of inference cost**. they read the bundled
   snapshot; no provider call. Cost per search is effectively the
   amortised compute of the API pod, a rounding error against inference.
 - **Cost per active user** is therefore dominated by how many *new*
@@ -89,7 +89,7 @@ classification volume becomes continuous rather than bursty.
 ## Cluster cost attribution
 
 Namespace labels (`env`, `app`) are on every workload, so per-namespace
-CPU/memory attribution is available from the metrics already scraped —
+CPU/memory attribution is available from the metrics already scraped , 
 the "AI Spend" and "Service Health" dashboards split by workload. On a
 single-node free-tier cluster the compute bill is ~$0 (credits); the
 honest statement is that **inference is ~100% of the marginal cost of

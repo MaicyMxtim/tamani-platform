@@ -7,7 +7,7 @@ Accepted
 The platform needs an event backbone for enrichment jobs and agent
 triggers: durable delivery, consumer groups so worker replicas share a
 stream, replay for backfill, and dead-lettering. Peak volume is a few
-thousand messages a day — the 1,275-venue catalogue reclassified end to
+thousand messages a day, the 1,275-venue catalogue reclassified end to
 end is one burst of ~1,300 messages. The cluster is a single 2 GB node.
 
 ## Options
@@ -37,5 +37,5 @@ requirement wins; operational weight is the scarcest resource here.
 ## Consequences
 Idempotency is mandatory in every consumer, forever. Replay and DLQ
 behaviour is proven by test (see Phase 4 demos). If requirements grow to
-multi-datacentre replication or compacted change logs, revisit Kafka —
+multi-datacentre replication or compacted change logs, revisit Kafka , 
 the publish/consume seam keeps that swap contained.

@@ -10,9 +10,9 @@ A production-grade internal platform running a venue-discovery backend on Kubern
 
 ## Read
 
-- **[Walkthrough](walkthrough.html)** — a tour of the finished platform: architecture, components and measured results.
-- **[Complete Guide](complete-guide.html)** — every concept explained for a beginner, then the platform built from an empty directory with every file and the reason for each.
-- **[Unit economics](unit-economics.html)** — the measured cost figures and their methods.
+- **[Walkthrough](walkthrough.html)**. a tour of the finished platform: architecture, components and measured results.
+- **[Complete Guide](complete-guide.html)**. every concept explained for a beginner, then the platform built from an empty directory with every file and the reason for each.
+- **[Unit economics](unit-economics.html)**. the measured cost figures and their methods.
 
 ## Measured results
 
@@ -25,6 +25,6 @@ A production-grade internal platform running a venue-discovery backend on Kubern
 
 ## How it maps to roles
 
-- **Cloud Support / SRE** — incident diagnosis, postmortems, service level objectives, burn-rate alerting.
-- **DevOps / Platform Engineer** — GitOps delivery, admission policy, the golden path and self-service CLI.
-- **AI Platform Engineer** — the governed gateway economics and the evaluation gate blocking a regressing prompt.
+- **Cloud Support / SRE**. incident diagnosis, postmortems, service level objectives, burn-rate alerting.
+- **DevOps / Platform Engineer**. GitOps delivery, admission policy, the golden path and self-service CLI.
+- **AI Platform Engineer**. the governed gateway economics and the evaluation gate blocking a regressing prompt.
