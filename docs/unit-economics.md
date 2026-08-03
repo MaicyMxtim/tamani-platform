@@ -60,10 +60,10 @@ config change, not a rebuild.
 of a self-hosted GPU that could serve an equivalent open model.
 
 - Provider (Opus): ~$4.10 per 1,000 classifications.
-- A modest cloud GPU (e.g. one L4/A10-class instance) runs ~$0.75–1.00/hr,
-  ~$550–730/month if always on.
+- A modest cloud GPU (e.g. one L4/A10-class instance) runs ~$0.75 to 1.00/hr,
+  ~$550 to 730/month if always on.
 - At ~350 input + 40 output tokens per classification, a single such GPU
-  serving a 7–8B open model sustains on the order of a few classifications
+  serving a 7 to 8B open model sustains on the order of a few classifications
   per second, call it ~200k/day at healthy utilisation.
 
 **Crossover:** self-hosting only wins when sustained volume fills the GPU.

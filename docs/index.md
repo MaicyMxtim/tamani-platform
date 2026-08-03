@@ -21,10 +21,5 @@ A production-grade internal platform running a venue-discovery backend on Kubern
 - Model tiering projected to cut blended cost by about 57% for a small, measured accuracy loss.
 - Golden-set accuracy: 80.3% precision, 68.0% recall, enforced as a CI regression gate.
 - Time from a single scaffold command to a service serving live traffic: 195 seconds.
-- Saturation point around 25–30 concurrent users, limited by node memory.
+- Saturation point around 25 to 30 concurrent users, limited by node memory.
 
-## How it maps to roles
-
-- **Cloud Support / SRE**. incident diagnosis, postmortems, service level objectives, burn-rate alerting.
-- **DevOps / Platform Engineer**. GitOps delivery, admission policy, the golden path and self-service CLI.
-- **AI Platform Engineer**. the governed gateway economics and the evaluation gate blocking a regressing prompt.
