@@ -169,6 +169,10 @@ The **operations agent** triages alerts. It inspects the cluster with a read-onl
 
 Prometheus scrapes metrics, Loki collects logs, and Grafana presents two dashboards: service health and AI spend. The service level objectives are 99.5% availability and 400&nbsp;ms p95 latency, with multi-window burn-rate alerts so a fast burn pages and a slow burn opens a ticket. Every alert has a runbook written before the alert ever fired.
 
+![The Tamani service health dashboard in Grafana](assets/img/grafana-service-health.png)
+
+*The live service health dashboard: 100% availability, 95&nbsp;ms p95 latency, a full 30-day error budget, zero pod restarts in 24 hours, and request rate against the memory of the single node.*
+
 ## Developer self-service
 
 The `tamani` CLI scaffolds a complete service from one command: a hardened container, health probes, metrics, a network policy, a monitoring configuration with an alert, a signed CI pipeline, an Argo CD application, a catalogue entry and a runbook. A scaffolded service reached live traffic in a measured 195 seconds, admitted through the same signature policy as every other workload.
