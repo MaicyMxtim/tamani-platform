@@ -19,6 +19,10 @@ Key outcomes:
 - A new service goes from one scaffold command to serving live traffic in 195 seconds.
 - Every image is signed, scanned and shipped with an SBOM, and the cluster admits signed images only.
 
+![The live Tamani API explorer](assets/img/api-explorer.png)
+
+*The live API at [platform.waypear.com/docs](https://platform.waypear.com/docs), with split liveness, readiness and startup probes exposed alongside the product endpoints.*
+
 ## The problem
 
 The workload is a venue discovery backend. Users search and browse venues, and an AI model classifies each venue's vibe and attributes from its description.
@@ -116,6 +120,10 @@ running service
 ```
 
 Every change flows through Git, so the cluster's state is reviewable, auditable and rebuildable. The cluster rejects any image that was signed by anything other than this repository's CI.
+
+![GitHub Actions CI run with secrets scan, tests and three parallel signed builds](assets/img/github-actions.png)
+
+*A real CI run: a secrets scan, the test suite, then parallel builds of the API, gateway and worker images. The run produced seven artifacts, including an SBOM for each image.*
 
 ## Design decisions
 
