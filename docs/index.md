@@ -1,6 +1,6 @@
 # Tamani Platform
 
-A production platform running a venue discovery backend on Kubernetes in AWS. It serves a public API, routes every AI call through a governed gateway, runs two autonomous agents inside a safety layer, and enforces a signed supply chain. It is live on the public internet.
+Tamani is an internal developer platform on AWS. It runs a real venue discovery backend on Kubernetes and delivers every change through GitOps: applications arrive signed, admission policy checks them, and monitoring covers them from their first request. Every AI call goes through a governed gateway, two autonomous agents operate inside a safety layer, and the whole system is live on the public internet.
 
 ## Executive summary
 
@@ -8,6 +8,7 @@ A production platform running a venue discovery backend on Kubernetes in AWS. It
 |---|---|
 | **Problem** | An AI-backed product needs safe deployment, visible AI spend and secure operations, with a small team and a small budget. |
 | **Solution** | A Kubernetes platform delivered by GitOps, with a governed AI gateway, governed autonomous agents, full observability and a signed supply chain. |
+| **Stack** | AWS · OpenTofu · k3s · Argo CD · GitHub Actions · Kyverno · NATS · FastAPI · Prometheus · Grafana · Loki |
 | **Scale** | One 2&nbsp;GB cloud node serving a catalogue of 1,275 venues. |
 | **Live** | [platform.waypear.com](https://platform.waypear.com/) · [API explorer](https://platform.waypear.com/docs) |
 | **Source** | [github.com/MaicyMxtim/tamani-platform](https://github.com/MaicyMxtim/tamani-platform) |
@@ -125,6 +126,14 @@ Every change flows through Git, so the cluster's state is reviewable, auditable 
 
 *A real CI run: a secrets scan, the test suite, then parallel builds of the API, gateway and worker images. The run produced seven artifacts, including an SBOM for each image.*
 
+![Argo CD managing the fourteen platform applications](assets/img/argocd-applications.png)
+
+*Argo CD manages the platform as fourteen applications, from cert-manager and ingress through Kyverno, Loki and the workloads themselves. Thirteen sync automatically from Git.*
+
+![The production workloads application, healthy and deliberately out of sync](assets/img/argocd-workloads-tree.png)
+
+*The fourteenth is production. `workloads-prod` is Healthy but shows OutOfSync with auto-sync disabled, because production is pinned to an exact promoted commit and moves only when a person syncs it. The last sync records the promotion commit it shipped.*
+
 ## Design decisions
 
 **NATS JetStream over Kafka and Redis Streams.** The event backbone needs durable delivery, consumer groups, replay and dead-lettering, at a peak volume of a few thousand messages a day on a 2&nbsp;GB node. Kafka wants gigabytes of memory and solves scale problems this workload will never have. Redis Streams would couple the cache and the system of record into one failure domain. JetStream is a single 15&nbsp;MB binary that provides all four requirements. The cost is at-least-once delivery, which is handled with idempotency keys in every consumer. The full reasoning is in [ADR&nbsp;0002](https://github.com/MaicyMxtim/tamani-platform/blob/main/docs/adr/0002-nats-jetstream-over-kafka-and-redis-streams.md).
@@ -179,24 +188,45 @@ Prometheus scrapes metrics, Loki collects logs, and Grafana presents two dashboa
 
 ## Developer self-service
 
-The `tamani` CLI scaffolds a complete service from one command: a hardened container, health probes, metrics, a network policy, a monitoring configuration with an alert, a signed CI pipeline, an Argo CD application, a catalogue entry and a runbook. A scaffolded service reached live traffic in a measured 195 seconds, admitted through the same signature policy as every other workload.
+The platform exists so that a developer can ship a service without becoming an infrastructure expert. This is the whole journey:
 
-## Problems along the way
+```
+developer runs `tamani new <service>`
+        │
+scaffold        hardened container · health probes · metrics · network policy
+        │       alert rule · runbook · catalogue entry
+        │
+git push        CI tests, builds, scans and signs the image, and attaches an SBOM
+        │
+Argo CD         picks up the generated application and deploys it
+        │
+Kyverno         admits the image because the signature verifies
+        │
+live            the service is receiving traffic, with its dashboard
+                and alert already in place
+```
 
-The node ran out of memory twice under load, and both incidents have [postmortems](https://github.com/MaicyMxtim/tamani-platform/tree/main/runbooks/postmortems). Load and chaos experiments afterwards established the saturation point at 25 to 30 concurrent users, set by the memory of the single node, and confirmed how the platform recovers when components are killed. The [chaos results](https://github.com/MaicyMxtim/tamani-platform/tree/main/runbooks/chaos) record each experiment.
+This was measured end to end: 195 seconds from the scaffold command to live traffic, through the same signature policy as every other workload.
+
+## Engineering challenges
+
+**Running a full platform in 2&nbsp;GB of memory.** The budget covered one small node, and a typical platform stack assumes several times that. The response was to make operational weight a selection criterion: k3s instead of a full distribution, NATS JetStream's single 15&nbsp;MB binary as the event backbone, Loki's label-based indexing for logs, and resource limits on every workload so nothing grows unnoticed. The platform fits, and its limit is measured precisely: load testing found saturation at 25 to 30 concurrent users, and the node ran out of memory twice on the way there. Both incidents have [postmortems](https://github.com/MaicyMxtim/tamani-platform/tree/main/runbooks/postmortems), and the [chaos experiments](https://github.com/MaicyMxtim/tamani-platform/tree/main/runbooks/chaos) record how the platform recovers when components are killed.
+
+**Enforcing security without slowing delivery.** Signed images, pinned tags, resource limits and non-privileged workloads are a heavy compliance burden if every service has to meet them by hand. The response was to build compliance into the golden path: the CLI scaffold ships a hardened container, probes, a network policy and a signed pipeline, so a brand-new service passes admission policy by default. The measured result is a service reaching live traffic in 195 seconds without a single policy exception.
+
+**Keeping AI spend visible and bounded.** Inference dominates the marginal cost of this product, and spend through a shared API key is invisible until the bill arrives. The response was to give the provider key to exactly one service and route every call through it, with per-tenant budgets, a semantic cache and a per-request cost ledger. The result is that cost is a number on a dashboard: $4.01 per thousand classifications after caching, a measured 22% cache saving, and a measured 57% further cut available from confidence-based tiering.
 
 ## Results
 
-| Measure | Value |
+| What was measured | Result |
 |---|---|
-| Availability in the measured window | 100% |
-| p95 latency | 95 ms |
-| Cost per thousand classifications | about $4.01 after caching |
-| Saving projected from model tiering | about 57% |
-| Classification precision | 80.3% |
-| Classification recall | 68.0% |
-| Scaffold command to live traffic | 195 seconds |
-| Saturation point | 25 to 30 concurrent users |
+| Availability of the live service over the measured window, against the 99.5% objective | 100% |
+| p95 latency of the live API, against the 400&nbsp;ms objective | 95&nbsp;ms |
+| Cost per thousand AI classifications through the gateway, after caching | about $4.01 |
+| Further saving from confidence-based model tiering, measured on the golden set | about 57% |
+| Classification precision and recall on the 144-venue golden set | 80.3% / 68.0% |
+| Time from one scaffold command to a new service taking live traffic | 195 seconds |
+| Concurrent users at which the single 2&nbsp;GB node saturates, found by load testing | 25 to 30 |
 
 Classification accuracy is enforced in CI as a regression gate, so a change that makes the model worse fails the build.
 
