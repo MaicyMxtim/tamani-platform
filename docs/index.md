@@ -148,6 +148,10 @@ Every AI call in the system goes through one service, and that service is the on
 - **A cost ledger** with one record per request: tenant, model, tokens, cost, cache hit. The unit economics report is built from this ledger.
 - **A review queue** for low-confidence classifications, which go to a human reviewer before anything is written.
 
+![The AI spend dashboard in Grafana after a 60-venue enrichment batch](assets/img/grafana-ai-spend.png)
+
+*The AI spend dashboard after re-enriching 60 venues: 24&nbsp;cents of spend, 40,958 tokens, input and output tokens tracked separately, and every request attributed to a purpose in the cost ledger.*
+
 The [unit economics report](unit-economics.html) measures the options this creates. Running the 144-venue golden set through three models showed that routing straightforward classifications to a small model and escalating the ambiguous ones cuts blended cost by about 57%, for a small and measured accuracy loss. The gateway already records confidence per classification, so enabling this is a configuration change.
 
 ## Autonomous agents
