@@ -4,7 +4,9 @@ An agentic infrastructure project: the Tamani venue discovery backend run as a
 production-grade internal platform on Kubernetes, delivered by GitOps, with a
 governed inference gateway and agentic workloads under evaluation gates.
 
-Live at **https://platform.waypear.com**. Full plan and evidence in `docs/`.
+Formerly deployed live on AWS at platform.waypear.com; the cloud deployment
+has been decommissioned to keep running costs at zero. The full stack runs
+locally with `make up`. Full plan and evidence in `docs/`.
 
 
 | Phase | Status | Evidence |
@@ -23,9 +25,8 @@ Live at **https://platform.waypear.com**. Full plan and evidence in `docs/`.
 | 11. Cost & unit economics | done | tiering experiment, crossover, $/1k published |
 
 Documentation:
-  beginner, then the platform built from an empty directory with every file's full
-  contents and the reason for each. Start here.
-- **`docs/walkthrough.md`**. a short tour of the finished platform.
+
+- **`docs/walkthrough.md`**. a short tour of the finished platform. Start here.
 
 Evidence: `docs/unit-economics.md`, `runbooks/postmortems/`,
 `runbooks/chaos/`, `runbooks/golden-path.md`, `docs/adr/`.

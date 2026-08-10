@@ -1,6 +1,6 @@
 # Tamani Platform
 
-Tamani is an internal developer platform on AWS. It runs a real venue discovery backend on Kubernetes and delivers every change through GitOps: applications arrive signed, admission policy checks them, and monitoring covers them from their first request. Every AI call goes through a governed gateway, two autonomous agents operate inside a safety layer, and the whole system is live on the public internet.
+Tamani is an internal developer platform built on AWS. It runs a real venue discovery backend on Kubernetes and delivers every change through GitOps: applications arrive signed, admission policy checks them, and monitoring covers them from their first request. Every AI call goes through a governed gateway, two autonomous agents operate inside a safety layer, and the whole system ran live on the public internet during the build (the cloud deployment has since been decommissioned to keep running costs at zero; the stack runs locally with one command).
 
 ## Executive summary
 
@@ -10,7 +10,7 @@ Tamani is an internal developer platform on AWS. It runs a real venue discovery 
 | **Solution** | A Kubernetes platform delivered by GitOps, with a governed AI gateway, governed autonomous agents, full observability and a signed supply chain. |
 | **Stack** | AWS · OpenTofu · k3s · Argo CD · GitHub Actions · Kyverno · NATS · FastAPI · Prometheus · Grafana · Loki |
 | **Scale** | One 2&nbsp;GB cloud node serving a catalogue of 1,275 venues. |
-| **Live** | [platform.waypear.com](https://platform.waypear.com/) · [API explorer](https://platform.waypear.com/docs) |
+| **Status** | Ran live on AWS during the build; decommissioned to keep costs at zero, runs locally via `make up` |
 | **Source** | [github.com/MaicyMxtim/tamani-platform](https://github.com/MaicyMxtim/tamani-platform) |
 
 Key outcomes:
@@ -22,7 +22,7 @@ Key outcomes:
 
 ![The live Tamani API explorer](assets/img/api-explorer.png)
 
-*The live API at [platform.waypear.com/docs](https://platform.waypear.com/docs), with split liveness, readiness and startup probes exposed alongside the product endpoints.*
+*The API explorer while the platform was live, with split liveness, readiness and startup probes exposed alongside the product endpoints.*
 
 ## The problem
 

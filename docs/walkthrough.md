@@ -1,6 +1,6 @@
 # Tamani Platform Walkthrough
 
-A guided tour of what the Tamani Platform is, how it is built, and where each part lives. For the underlying concepts, see the study reference (`docs/study-reference.md`). For decisions, incidents and cost, see `docs/adr/`, `runbooks/` and `docs/unit-economics.md`.
+A guided tour of what the Tamani Platform is, how it is built, and where each part lives. For decisions, incidents and cost, see `docs/adr/`, `runbooks/` and `docs/unit-economics.md`.
 
 ---
 
@@ -8,16 +8,7 @@ A guided tour of what the Tamani Platform is, how it is built, and where each pa
 
 The Tamani Platform runs a venue-discovery backend as a production-grade internal platform. It takes a real workload, 1,275 Brighton venues, and builds the infrastructure that a platform, cloud, DevOps or SRE team would run around it: a Kubernetes platform delivered by GitOps, a governed AI inference gateway, autonomous agents kept safe by a governance layer, full observability, an enforced secure supply chain, reliability evidence, a developer self-service tool, and published unit economics.
 
-It is deployed live and reachable on the public internet.
-
-## Live endpoints
-
-- **Landing:** https://platform.waypear.com/
-- **Interactive API explorer:** https://platform.waypear.com/docs
-- **Venue search:** https://platform.waypear.com/venues?vibe=late-night
-- **Ranked feed:** https://platform.waypear.com/feed?limit=10
-
-The site runs on a single cloud node; under heavy load or during a deploy it can exhaust memory and briefly go offline, which is documented behaviour rather than a fault (see `runbooks/postmortems/` and `runbooks/chaos/`).
+It was deployed live on the public internet at `platform.waypear.com` during the build; the AWS deployment has since been decommissioned to keep running costs at zero. Everything below still runs locally with `make up`, and the evidence (dashboards, postmortems, chaos results) was captured while the platform was live.
 
 ## Architecture
 
